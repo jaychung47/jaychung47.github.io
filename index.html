@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jay's Animal Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ── THEME VARIABLES ── */
+:root {
+  --bg: #faf8f3;
+  --bg2: #f0ece2;
+  --surface: #ffffff;
+  --border: #d8d2c4;
+  --text: #1a1410;
+  --text2: #5a5248;
+  --text3: #8a8278;
+  --accent: #2d6a4f;
+  --accent2: #40916c;
+  --nav-bg: #1a1410;
+  --nav-text: #faf8f3;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+  /* game colors */
+  --g1: #e9c46a;
+  --g2: #52b788;
+  --g3: #4895ef;
+  --g4: #9b72cf;
+  --correct: #52b788;
+  --wrong: #e63946;
+  --neutral: #d8d2c4;
+}
+[data-theme="dark"] {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --surface: #1c2128;
+  --border: #2d3444;
+  --text: #e6e1d9;
+  --text2: #9ca3af;
+  --text3: #6b7280;
+  --accent: #52b788;
+  --accent2: #74c69d;
+  --nav-bg: #0d1117;
+  --nav-text: #e6e1d9;
+  --shadow: 0 2px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  --neutral: #2d3444;
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+button { cursor: pointer; font-family: inherit; }
+input { font-family: 'DM Mono', monospace; }
+
+/* ── NAV ── */
+nav {
+  background: var(--nav-bg);
+  color: var(--nav-text);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 24px;
+  height: 58px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+}
+.nav-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--nav-text);
+  letter-spacing: -0.02em;
+  margin-right: 32px;
+  white-space: nowrap;
+}
+.nav-brand span { color: var(--accent); }
+.nav-links { display: flex; gap: 4px; flex: 1; }
+.nav-btn {
+  background: none;
+  border: none;
+  color: var(--nav-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  opacity: 0.6;
+  transition: opacity 0.15s, background 0.15s;
+  letter-spacing: 0.01em;
+}
+.nav-btn:hover { opacity: 1; background: rgba(255,255,255,0.08); }
+.nav-btn.active { opacity: 1; background: rgba(255,255,255,0.12); }
+.nav-right { display: flex; align-items: center; gap: 8px; }
+.theme-toggle {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: var(--nav-text);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.1); }
+
+/* ── PAGES ── */
+.page { display: none; min-height: calc(100vh - 58px); }
+.page.active { display: block; }
+
+/* ── ABOUT PAGE ── */
+.about-page {
+  max-width: 640px;
+  margin: 60px auto;
+  padding: 0 24px;
+}
+.about-page h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1.15;
+  margin-bottom: 24px;
+  color: var(--text);
+}
+.about-page p {
+  color: var(--text2);
+  line-height: 1.75;
+  margin-bottom: 16px;
+  font-size: 1.05rem;
+}
+.placeholder-box {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+  color: var(--text3);
+  font-size: 0.9rem;
+  margin-top: 24px;
+}
+
+/* ── GAME WRAPPER ── */
+.game-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 12px;
+}
+.game-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--text);
+}
+.game-controls { display: flex; align-items: center; gap: 8px; }
+
+/* info button */
+.info-btn {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: none;
+  color: var(--text2);
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.info-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* icon buttons */
+.icon-btn {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text2);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 20px;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+  letter-spacing: 0.02em;
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--bg2); }
+
+/* modal */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 32px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+.modal h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+.modal p, .modal li {
+  color: var(--text2);
+  line-height: 1.65;
+  font-size: 0.92rem;
+  margin-bottom: 8px;
+}
+.modal ul { padding-left: 18px; }
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none;
+  color: var(--text3); font-size: 1.2rem;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  transition: color 0.15s, background 0.15s;
+}
+.modal-close:hover { color: var(--text); background: var(--bg2); }
+
+/* ─── CONNECTIONS GAME ─── */
+#conn-puzzle-id {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+
+.conn-attempts {
+  display: flex; gap: 6px; align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.conn-attempts-label { font-size: 0.82rem; color: var(--text2); margin-right: 4px; }
+.attempt-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--text);
+  transition: background 0.3s;
+}
+.attempt-dot.used { background: var(--wrong); }
+
+.conn-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+  position: relative;
+  max-width: 720px;
+}
+
+.conn-tile {
+  aspect-ratio: 1 / 0.7;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 6px;
+  line-height: 1.3;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+  user-select: none;
+  color: var(--text);
+  position: relative;
+  width: 100%;
+  max-width: 180px;
+}
+.conn-tile:hover:not(.solved):not(.selected) {
+  border-color: var(--accent2);
+  background: var(--bg2);
+}
+.conn-tile.selected {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+.conn-tile.shake {
+  animation: shake 0.5s ease;
+}
+
+/* solved banner rows */
+.conn-solved-row {
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.85rem;
+  animation: slideDown 0.45s cubic-bezier(0.22,1,0.36,1);
+  max-width: 720px;
+  margin-bottom: 8px;
+}
+.conn-solved-row .row-name { font-size: 0.72rem; opacity: 0.85; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; }
+.conn-solved-row .row-items { font-size: 0.82rem; }
+
+.conn-solved-row[data-group="1"] { background: var(--g1); color: #1a1410; }
+.conn-solved-row[data-group="2"] { background: var(--g2); }
+.conn-solved-row[data-group="3"] { background: var(--g3); }
+.conn-solved-row[data-group="4"] { background: var(--g4); }
+
+.conn-actions {
+  display: flex; gap: 8px; justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.conn-btn {
+  padding: 10px 24px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  transition: all 0.15s;
+  letter-spacing: 0.02em;
+}
+.conn-btn:hover { border-color: var(--accent); color: var(--accent); }
+.conn-btn.primary {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+.conn-btn.primary:hover { background: var(--accent); border-color: var(--accent); color: white; }
+.conn-btn:disabled { opacity: 0.35; cursor: default; }
+
+.conn-status {
+  text-align: center;
+  font-size: 0.85rem;
+  min-height: 24px;
+  color: var(--text2);
+  margin-bottom: 8px;
+  font-style: italic;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ─── CROSSWORD GAME ─── */
+.crossword-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 620px) {
+  .crossword-layout { grid-template-columns: 1fr; }
+  .cw-grid-wrap { overflow-x: auto; }
+}
+
+.cw-grid-wrap {
+  max-width: 340px;
+  overflow: hidden;
+}
+
+.cw-grid {
+  display: inline-grid;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  max-width: 100%;
+}
+
+.cw-cell {
+  width: 100%; height: 100%;
+  aspect-ratio: 1;
+  background: var(--surface);
+  border: 1.5px solid #b0a898;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  cursor: default;
+}
+[data-theme="dark"] .cw-cell {
+  border-color: #3d4a5c;
+}
+.cw-cell.black { background: var(--bg); border: none; cursor: default; }
+.cw-cell input {
+  width: 100%; height: 100%;
+  border: none; outline: none;
+  background: transparent;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: clamp(0.6rem, 2.2vw, 0.9rem);
+  font-weight: 500;
+  color: var(--text);
+  text-transform: uppercase;
+  caret-color: var(--accent);
+}
+.cw-cell.active-word { background: #e8f4fd; }
+[data-theme="dark"] .cw-cell.active-word { background: #1e3a4a; }
+.cw-cell.active-cursor { background: #b3d9f5; }
+[data-theme="dark"] .cw-cell.active-cursor { background: #2a5a7a; }
+.cw-cell.correct { background: #d4edda; }
+[data-theme="dark"] .cw-cell.correct { background: #1a3a28; }
+.cw-cell.correct input { color: var(--correct); }
+.cw-cell.wrong { background: #fde8ea; }
+[data-theme="dark"] .cw-cell.wrong { background: #3a1a1d; }
+.cw-cell-num {
+  position: absolute;
+  top: 1px; left: 2px;
+  font-size: 0.48rem;
+  font-family: 'DM Mono', monospace;
+  color: var(--text3);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.cw-clues {
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.cw-clues::-webkit-scrollbar { width: 4px; }
+.cw-clues::-webkit-scrollbar-track { background: transparent; }
+.cw-clues::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.cw-clue-section { margin-bottom: 20px; }
+.cw-clue-section h3 {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+.cw-clue {
+  display: flex;
+  gap: 10px;
+  padding: 5px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s;
+  font-size: 0.83rem;
+  color: var(--text2);
+  line-height: 1.4;
+}
+.cw-clue:hover { background: var(--bg2); }
+.cw-clue.active { background: var(--bg2); color: var(--text); }
+.cw-clue.solved { color: var(--correct); }
+.cw-clue-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text3);
+  min-width: 20px;
+  font-weight: 500;
+}
+
+.cw-controls {
+  display: flex; gap: 8px; align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.autocheck-toggle {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.83rem;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  transition: all 0.15s;
+  user-select: none;
+}
+.autocheck-toggle input { display: none; }
+.toggle-pip {
+  width: 32px; height: 18px;
+  background: var(--neutral);
+  border-radius: 9px;
+  position: relative;
+  transition: background 0.2s;
+}
+.toggle-pip::after {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  background: white;
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.autocheck-toggle.on .toggle-pip { background: var(--accent); }
+.autocheck-toggle.on .toggle-pip::after { transform: translateX(14px); }
+
+.cw-complete-banner {
+  display: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  text-align: center;
+  padding: 20px;
+  border-radius: var(--radius);
+  margin-top: 16px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  animation: popIn 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ── UTIL ── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">Jay's <span>Animal</span> Games</div>
+  <div class="nav-links">
+    <button class="nav-btn active" onclick="showPage('connections')">Connections</button>
+    <button class="nav-btn" onclick="showPage('crossword')">Crossword</button>
+    <button class="nav-btn" onclick="showPage('about')">About</button>
+  </div>
+  <div class="nav-right">
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+  </div>
+</nav>
+
+<!-- CONNECTIONS PAGE -->
+<div class="page active" id="page-connections">
+  <div class="game-page">
+    <div class="game-header">
+      <div>
+        <div class="game-title">Connections</div>
+        <div id="conn-puzzle-id">Loading…</div>
+      </div>
+      <div class="game-controls">
+        <button class="icon-btn" onclick="newConnGame()">⟳ New Game</button>
+        <button class="info-btn" onclick="openModal('conn-modal')" title="How to play">i</button>
+      </div>
+    </div>
+
+    <div class="conn-attempts">
+      <span class="conn-attempts-label">Attempts:</span>
+      <div class="attempt-dot" id="dot-0"></div>
+      <div class="attempt-dot" id="dot-1"></div>
+      <div class="attempt-dot" id="dot-2"></div>
+      <div class="attempt-dot" id="dot-3"></div>
+    </div>
+
+    <div class="conn-status" id="conn-status"></div>
+    <div id="conn-banners"></div>
+    <div class="conn-grid" id="conn-grid"></div>
+
+    <div class="conn-actions">
+      <button class="conn-btn" onclick="connShuffle()">Shuffle</button>
+      <button class="conn-btn" onclick="connDeselect()">Deselect All</button>
+      <button class="conn-btn primary" id="conn-submit-btn" onclick="connSubmit()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- CROSSWORD PAGE -->
+<div class="page" id="page-crossword">
+  <div class="game-page">
+    <div class="game-header">
+      <div class="game-title">Crossword</div>
+      <div class="game-controls">
+        <button class="icon-btn" onclick="newCWGame()">⟳ New Game</button>
+        <button class="info-btn" onclick="openModal('cw-modal')" title="How to play">i</button>
+      </div>
+    </div>
+
+    <div class="cw-controls">
+      <label class="autocheck-toggle" id="autocheck-label" onclick="toggleAutocheck()">
+        <span class="toggle-pip"></span>
+        Autocheck
+      </label>
+    </div>
+
+    <div class="crossword-layout">
+      <div class="cw-grid-wrap">
+        <div class="cw-grid" id="cw-grid"></div>
+      </div>
+      <div class="cw-clues" id="cw-clues"></div>
+    </div>
+
+    <div class="cw-complete-banner" id="cw-complete">
+      🎉 Puzzle Complete! Well done!
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT PAGE -->
+<div class="page" id="page-about">
+  <div class="about-page">
+    <h1>About Jay's Animal Games 🐾</h1>
+    <div class="placeholder-box">
+      <p>✏️ This section is waiting for your story!</p>
+      <p style="margin-top:8px; font-size:0.85rem;">Edit the <code>index.html</code> file to fill in your About content here.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CONNECTIONS MODAL -->
+<div class="modal-overlay" id="conn-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('conn-modal')">✕</button>
+    <h2>How to Play Connections</h2>
+    <p>Find four groups of four animals that share a common theme.</p>
+    <ul>
+      <li>Tap tiles to select them (up to 4).</li>
+      <li>Press <strong>Submit</strong> to check if they form a group.</li>
+      <li>You have <strong>4 attempts</strong> total.</li>
+      <li>Use <strong>Shuffle</strong> to rearrange the tiles.</li>
+    </ul>
+    <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;">
+      <span style="background:var(--g1);color:#1a1410;padding:3px 10px;border-radius:4px;font-size:0.8rem;font-weight:600;">Group 1</span>
+      <span style="background:var(--g2);color:white;padding:3px 10px;border-radius:4px;font-size:0.8rem;font-weight:600;">Group 2</span>
+      <span style="background:var(--g3);color:white;padding:3px 10px;border-radius:4px;font-size:0.8rem;font-weight:600;">Group 3</span>
+      <span style="background:var(--g4);color:white;padding:3px 10px;border-radius:4px;font-size:0.8rem;font-weight:600;">Group 4</span>
+    </div>
+  </div>
+</div>
+
+<!-- CROSSWORD MODAL -->
+<div class="modal-overlay" id="cw-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('cw-modal')">✕</button>
+    <h2>How to Play Crossword</h2>
+    <p>Fill in the animal names using the clues provided.</p>
+    <ul>
+      <li>Click a cell or clue to select a word.</li>
+      <li>Click the same cell again to switch between Across / Down.</li>
+      <li>Use <strong>Autocheck</strong> to see correct letters highlighted in green as you type.</li>
+      <li>Without Autocheck, the word highlights green only when fully and correctly filled.</li>
+      <li>Press <strong>New Game</strong> to get a freshly generated puzzle.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+// DATA
+const CW_DATA=[{"hint": "Blue ___", "answer": "jay"}, {"hint": "Large rodent w/ orange teeth", "answer": "beaver"}, {"hint": "Nicknamed the unicorn of the sea", "answer": "narwhal"}, {"hint": "Yodeling dog breed", "answer": "basenji"}, {"hint": "Name for melanistic big cats", "answer": "black panther"}, {"hint": "Nocturnal marsupial pollinator", "answer": "kinkajou"}, {"hint": "Sex-changing fish", "answer": "clownfish"}, {"hint": "Dog breed w/ butterfly-shaped ears", "answer": "papillon"}, {"hint": "Duck-billed monotreme", "answer": "platypus"}, {"hint": "Songbird known for butchering small prey; loggerhead ___", "answer": "shrike"}, {"hint": "The main bird Darwin studied", "answer": "finch"}, {"hint": "Striped wild cat", "answer": "tiger"}, {"hint": "Striped domesticated cat", "answer": "tabby"}, {"hint": "Superhero sidekick; backyard bird", "answer": "robin"}, {"hint": "Fairytale sled-pullers", "answer": "reindeer"}, {"hint": "Rodent also associated w/ computers", "answer": "mouse"}, {"hint": "A neutered horse", "answer": "gelding"}, {"hint": "An emblem or a pinniped; navy ___", "answer": "seal"}, {"hint": "Reptilian & a rubbery shoe brand", "answer": "crocodile"}, {"hint": "A herd of these is called a dazzle", "answer": "zebra"}, {"hint": "Commonly mistaken for a crow", "answer": "raven"}, {"hint": "Peter ___", "answer": "rabbit"}, {"hint": "Terrestrial turtle", "answer": "tortoise"}, {"hint": "Hungry, hungry herbivore", "answer": "hippo"}, {"hint": "Mini leopard found in the Americas", "answer": "ocelot"}, {"hint": "Largest primates", "answer": "gorilla"}, {"hint": "A skin growth or tunnel-digging rodent", "answer": "mole"}, {"hint": "Stereotyped moon-howlers", "answer": "wolf"}, {"hint": "Highly trafficked, scale-covered, ant-eating mammal", "answer": "pangolin"}, {"hint": "A group of these is called a skulk", "answer": "fox"}, {"hint": "Wait, hoo?", "answer": "owl"}, {"hint": "Baa baa black ___", "answer": "sheep"}, {"hint": "Small horse", "answer": "pony"}, {"hint": "Large horse", "answer": "draft"}, {"hint": "Cartilaginous fish", "answer": "shark"}, {"hint": "Mammalian kelp drifters", "answer": "otter"}, {"hint": "Fish w/ a prehensile tail", "answer": "seahorse"}, {"hint": "Sea cow", "answer": "manatee"}, {"hint": "Madagascan spiky haired rodent", "answer": "tenrec"}, {"hint": "Moustached wyvern", "answer": "bearded dragon"}, {"hint": "Nocturnal trash-raider", "answer": "raccoon"}, {"hint": "Fastest animal", "answer": "peregrine"}, {"hint": "Pumba from the lion king", "answer": "warthog"}, {"hint": "Transportation company & dog breed", "answer": "greyhound"}, {"hint": "Giggling australian bird", "answer": "kookaburra"}, {"hint": "Bouncy marisupial", "answer": "kangaroo"}, {"hint": "Largest bear species", "answer": "polarbear"}, {"hint": "Sports equipment & gliding animal", "answer": "bat"}, {"hint": "Arctic blubbery mammal", "answer": "walrus"}, {"hint": "Two E's away from a beard", "answer": "goat"}, {"hint": "Bluey's dog breed", "answer": "cattle dog"}, {"hint": "Golden/ labrador ___", "answer": "retriever"}, {"hint": "Oreo-colored bear", "answer": "panda"}, {"hint": "Name for a tricolor cat", "answer": "calico"}, {"hint": "Often used to describe male ungulates", "answer": "bull"}, {"hint": "Rodent commonly kept as a pet", "answer": "hamster"}, {"hint": "Pinchy arthropod", "answer": "crab"}, {"hint": "Dust-bathing rodent", "answer": "chinchilla"}, {"hint": "Whale cowboys", "answer": "barnacle"}, {"hint": "A group of these is called a kaleidoscope", "answer": "butterfly"}, {"hint": "Maned feline", "answer": "lion"}, {"hint": "Ariel's unrealistic fish companion", "answer": "flounder"}, {"hint": "Ocean zucchini", "answer": "sea cucumber"}, {"hint": "Ring tailed ___", "answer": "lemur"}, {"hint": "Fluffy-tailed nucivore", "answer": "squirrel"}, {"hint": "Largest cat breed", "answer": "maine coon"}, {"hint": "An outfit & a cat coat pattern", "answer": "tuxedo"}, {"hint": "Reptilian w/ four heart chambers", "answer": "alligator"}, {"hint": "Word said in disgust that's also a female sheep", "answer": "ewe"}, {"hint": "Type of mongoose that lives in big matriarchal groups", "answer": "dwarf"}, {"hint": "Largest rodent", "answer": "capybara"}, {"hint": "Spotted speedster", "answer": "cheetah"}, {"hint": "Famous flightless bird", "answer": "penguin"}, {"hint": "Construction vehicle & a bird", "answer": "crane"}, {"hint": "Cackling African canine that live in matriarchal packs", "answer": "hyena"}, {"hint": "A group of these is the same as it is for birds", "answer": "sheep"}, {"hint": "Livestock whose name is used as an insult", "answer": "pig"}, {"hint": "A type of frog", "answer": "toad"}, {"hint": "The female is the first solfege syllable", "answer": "deer"}, {"hint": "Long eared, jumping desert marsupial", "answer": "jerboa"}, {"hint": "Labradoodle = lab x ___", "answer": "poodle"}, {"hint": "Dog often shortened to \"rottie\"", "answer": "rottweiler"}, {"hint": "A fish that fishes", "answer": "anglerfish"}, {"hint": "Often confused w/ pufferfish", "answer": "porcupinefish"}, {"hint": "A bird of prey", "answer": "hawk"}, {"hint": "Toxic bird", "answer": "pitohui"}, {"hint": "Bird w/ a fancy tail & mimicking abilities", "answer": "lyrebird"}, {"hint": "Tailless amphibians", "answer": "frog"}, {"hint": "Celebratory exclamation & a color-changing fish", "answer": "wahoo"}, {"hint": "Dromedary or bactrian", "answer": "camel"}, {"hint": "Water bear", "answer": "tardigrade"}, {"hint": "Puma, mountain lion, or panther", "answer": "cougar"}, {"hint": "Tropical big cat w/ rosettes", "answer": "jaguar"}, {"hint": "Horse footwear & a type of arthropod", "answer": "horseshoe"}, {"hint": "Forest giraffe", "answer": "okapi"}, {"hint": "Debated member of the big cats", "answer": "snow leopard"}, {"hint": "Dog bred for badger hunting", "answer": "dachshund"}, {"hint": "Tasmanian or thorny ___", "answer": "devil"}, {"hint": "False antelope", "answer": "pronghorn"}, {"hint": "Hairless dog breed", "answer": "xolo"}, {"hint": "Silly ___", "answer": "goose"}, {"hint": "Buzzing avian", "answer": "hummingbird"}, {"hint": "You and me", "answer": "human"}, {"hint": "Guitarfish", "answer": "bass"}, {"hint": "Shovelnose ray", "answer": "guitarfish"}, {"hint": "Bugling north American ungulate", "answer": "elk"}, {"hint": "The only venomous primate in the world", "answer": "slow loris"}, {"hint": "Dog w/ the same tongue color as giraffes", "answer": "chow"}, {"hint": "Jesus lizard", "answer": "basilisk"}, {"hint": "Australian equivalent to the Easter bunny", "answer": "bilby"}, {"hint": "Geico mascot", "answer": "gecko"}, {"hint": "Madagascan lemur-eater", "answer": "fossa"}, {"hint": "A group is called a pod", "answer": "dolphin"}, {"hint": "Hand-held pointing device and rodent", "answer": "mouse"}, {"hint": "Parrot with yellow crest", "answer": "cockatoo"}, {"hint": "Stinky black and white animal", "answer": "skunk"}, {"hint": "Wrinkly, droopy dog known for their powerful nose", "answer": "bloodhound"}, {"hint": "Their babies are called puggles", "answer": "echidna"}, {"hint": "Girl name and type of fish", "answer": "molly"}, {"hint": "Type of shark w/ a detachable jaw", "answer": "goblin"}, {"hint": "Ocean opera singer", "answer": "whale"}, {"hint": "Patriotic bald bird", "answer": "eagle"}, {"hint": "Color-changing lizard", "answer": "chameleon"}, {"hint": "Squirrel-sized monkey", "answer": "tamarin"}, {"hint": "Hooded snake", "answer": "cobra"}, {"hint": "Cow canine", "answer": "bulldog"}, {"hint": "Lassie's dog breed", "answer": "collie"}, {"hint": "Dogs bred to flush out & retrieve game; can be water or land", "answer": "spaniel"}, {"hint": "Street sprinter", "answer": "roadrunner"}, {"hint": "Largest dog breed", "answer": "great dane"}, {"hint": "Orange ape", "answer": "orangutan"}, {"hint": "Tiny dog breed & Mexican state", "answer": "chihuahua"}, {"hint": "Roly-polies and pillbugs", "answer": "isopod"}, {"hint": "Type of hippo that Moo Deng is", "answer": "pygmy"}, {"hint": "Dog breed commonly mistaken for German shepherds", "answer": "malinois"}, {"hint": "Largest kind of woodpecker", "answer": "pileated"}, {"hint": "A fish that's always ready for bed", "answer": "pajama shark"}, {"hint": "A group is called a covey or bevy", "answer": "quail"}, {"hint": "Small canine that looks like a German shepherd fox hybrid", "answer": "jackal"}, {"hint": "Pink wading bird", "answer": "flamingo"}, {"hint": "Tundra canine", "answer": "arctic wolf"}, {"hint": "Scaled noodle", "answer": "snake"}, {"hint": "Wood-drilling bird", "answer": "woodpecker"}, {"hint": "Aggressive corvid", "answer": "magpie"}, {"hint": "Quadrilateral & a predatory bird", "answer": "kite"}, {"hint": "South American freshwater fish w/ sharp teeth", "answer": "piranha"}, {"hint": "Lily pad-stepping bird", "answer": "jacana"}, {"hint": "Type of shark that can live in fresh and saltwater", "answer": "bull shark"}, {"hint": "Ocean leo", "answer": "sea lion"}, {"hint": "Hairless cat", "answer": "sphynx"}, {"hint": "Hen or rooster", "answer": "chicken"}, {"hint": "Senior member of the Catholic Church & a songbird", "answer": "cardinal"}, {"hint": "Dog often shortened to \"newfie\"", "answer": "newfoundland"}, {"hint": "Songbird & a fungal infection", "answer": "thrush"}, {"hint": "Type of bird & step in digestion", "answer": "swallow"}, {"hint": "Polar, black, brown, sun, spectacled, Asian, sloth, panda", "answer": "bear"}, {"hint": "Prefix that means four & a type of fish", "answer": "tetra"}, {"hint": "Winter footwear & type of cat", "answer": "snowshoe"}, {"hint": "A group is called a business", "answer": "ferret"}, {"hint": "A group is called a murder", "answer": "crow"}, {"hint": "Shell-wearing slug", "answer": "snail"}, {"hint": "This rodent lost the race", "answer": "hare"}, {"hint": "Drawing & a name for poodle mixes", "answer": "doodle"}, {"hint": "Orange/ golden Australian wild dog", "answer": "dingo"}, {"hint": "Name of venomous snakes", "answer": "viper"}, {"hint": "Dog often confused w/ malmute", "answer": "husky"}, {"hint": "Marsupials in Australia & New Guinea", "answer": "possum"}, {"hint": "Feline avian", "answer": "catbird"}, {"hint": "Critically endangered porpoise", "answer": "vaquita"}, {"hint": "Donkey x horse", "answer": "mule"}, {"hint": "Largest bird in the world", "answer": "ostrich"}, {"hint": "Loaf-shaped dog breed", "answer": "corgi"}, {"hint": "Small, forest cat w/ large paws & tufted ears", "answer": "lynx"}, {"hint": "Small, savannah cat w/ large paws & tufted ears", "answer": "caracal"}, {"hint": "Round, spiky echinoderm", "answer": "urchin"}, {"hint": "Large, aggressive, flightless bird found in New Guinea", "answer": "cassowary"}, {"hint": "North American marsupials", "answer": "opossum"}, {"hint": "A group is called a mob", "answer": "emu"}, {"hint": "Mythological aquatic horse & australian herding dog", "answer": "kelpie"}, {"hint": "Common farm ungulate; jack or jenny", "answer": "donkey"}, {"hint": "Homeless snail", "answer": "slug"}, {"hint": "The fish that killed Nemo's mom", "answer": "barracuda"}, {"hint": "Type of bird & a name for a crazy person", "answer": "cuckoo"}, {"hint": "Large, slobbery dogs; often livestock guardians", "answer": "mastiff"}, {"hint": "Small decapod crustacean; prawn", "answer": "shrimp"}, {"hint": "Commonly mistaken as pigeon; sign of peace", "answer": "dove"}, {"hint": "An enemy", "answer": "anemone"}, {"hint": "Small dogs bred to hunt vermin; bull, airedale, yorkshire ___", "answer": "terrier"}, {"hint": "Rabbits, goats, and cats w/ long, silky hair/ wool", "answer": "angora"}, {"hint": "Foul homophone & a type of bird", "answer": "fowl"}, {"hint": "Long-haired domesticated cattle", "answer": "yak"}, {"hint": "Sharp-clawed weasel; yellow & black superhero", "answer": "wolverine"}, {"hint": "To crouch or bow & a waddling waterbird", "answer": "duck"}, {"hint": "Small weasel; also called an ermine", "answer": "stoat"}, {"hint": "Fish that can walk", "answer": "mudskipper"}, {"hint": "Type of drum & a tropical antelope", "answer": "bongo"}, {"hint": "A group of these is called a tower", "answer": "giraffe"}, {"hint": "Small, lean, nocturnal, musk-producing mammal", "answer": "civet"}, {"hint": "Fish that run upstream", "answer": "salmon"}, {"hint": "Type of bear that's not a bear", "answer": "koala"}, {"hint": "Color of panda that's not a panda", "answer": "red"}, {"hint": "Young female horse", "answer": "filly"}, {"hint": "Feral swine & a male bear", "answer": "boar"}, {"hint": "Sexually dimorphic tropical bird w/ colorful plumage", "answer": "bird of paradise"}, {"hint": "Crocodilian w/ a slender snout", "answer": "gharial"}, {"hint": "A gliding sport & a flat fish", "answer": "skate"}, {"hint": "Baby swan", "answer": "cygnet"}, {"hint": "A group of these is called a prickle", "answer": "porcupine"}, {"hint": "Annoying bloodsucker", "answer": "mosquito"}, {"hint": "Often confused w/ malinois; sheep herder", "answer": "shepherd"}, {"hint": "Finger & gun/ bird dog", "answer": "pointer"}, {"hint": "Opposite of a subtractor; venomous snake", "answer": "adder"}, {"hint": "Baby-bringing bird", "answer": "stork"}, {"hint": "Shaggy dog bred for wolf-hunting", "answer": "wolfhound"}, {"hint": "Boring guy name; male donkey", "answer": "jack"}, {"hint": "Ground-dwelling game bird", "answer": "pheasant"}, {"hint": "Dog w/ corded fur; sounds like a machine", "answer": "puli"}, {"hint": "A type of bank", "answer": "pig"}, {"hint": "Bye son!", "answer": "bison"}, {"hint": "Pearl-makers", "answer": "oyster"}, {"hint": "Baby cat", "answer": "kitten"}, {"hint": "Pinchy invertebrate", "answer": "crab"}, {"hint": "Rodent in a tongue-twister", "answer": "woodchuck"}, {"hint": "Alternative name for a parakeet", "answer": "budgie"}, {"hint": "Flavor & a forgetful fish' species", "answer": "tang"}, {"hint": "Florence ___; night-singing passerine", "answer": "nightingale"}, {"hint": "Melon head", "answer": "beluga"}, {"hint": "A female cat capable of breeding", "answer": "queen"}, {"hint": "Supposed season-predictor", "answer": "groundhog"}, {"hint": "Commonly mistaken for an octopus", "answer": "squid"}, {"hint": "Male bighorn sheep", "answer": "ram"}, {"hint": "Baby bear or big cat", "answer": "cub"}, {"hint": "A group of these is called a murmuration", "answer": "songbird"}, {"hint": "Spongebob's best friend's species", "answer": "starfish"}, {"hint": "Filly or colt", "answer": "foal"}, {"hint": "General name for hollow-horned ungulates", "answer": "antelope"}, {"hint": "Female bear", "answer": "sow"}, {"hint": "Crustacean w/ a segmented abdomen", "answer": "lobster"}, {"hint": "Hoofed mammals", "answer": "ungulate"}, {"hint": "Shortened name for french bulldogs", "answer": "frenchie"}, {"hint": "Shortened name for bernese mountain dogs", "answer": "bernie"}, {"hint": "Zaboomafoo's mascot", "answer": "sifaka"}, {"hint": "Nocturnal lemur w/ a special finger", "answer": "aye aye"}, {"hint": "Small, fluffy, gliding marsupial", "answer": "sugar glider"}, {"hint": "Commonly mistaken for a llama", "answer": "alpaca"}, {"hint": "Burrowing rodent that rhymes w/ another burrowing rodent", "answer": "vole"}, {"hint": "Arsonist predatory bird", "answer": "firehawk"}, {"hint": "Elk yearling", "answer": "spike"}, {"hint": "Horse x zebra", "answer": "zorse"}, {"hint": "Silverbacked ape", "answer": "gorilla"}, {"hint": "Brood parasite commonly found around bovine", "answer": "cowbird"}, {"hint": "Pink, deepsea dweller", "answer": "blobfish"}, {"hint": "Highly invasive spiny lizard", "answer": "iguana"}, {"hint": "Hall ___; a type of lizard", "answer": "monitor"}, {"hint": "Wrinkled Chinese dog breed", "answer": "shar pei"}, {"hint": "Eel-shaped, jawless, blood-sucking fish", "answer": "lamprey"}, {"hint": "Bonobo relative", "answer": "chimpanzee"}];const CONN_DATA=[[{"group": 1, "name": "Nocturnal Marsupials", "items": ["Sugar glider", "possum", "quoll", "koala"]}, {"group": 2, "name": "Easter Animals", "items": ["Rabbit", "bilby", "chicken", "lamb"]}, {"group": 3, "name": "Egg Layers", "items": ["Corn snake", "osprey", "platypus", "trout"]}, {"group": 4, "name": "Animals w/ Fruit Names", "items": ["Lemon shark", "banana slug", "coconut crab", "kiwi"]}], [{"group": 1, "name": "Animals w/ Long Snouts", "items": ["Echidna", "anteater", "elephant", "tapir"]}, {"group": 2, "name": "Sea Birds", "items": ["Ibis", "heron", "pelican", "seagull"]}, {"group": 3, "name": "Prehensile Tailed Animals", "items": ["Chameleon", "spider monkey", "binturong", "pangolin"]}, {"group": 4, "name": "Christmas Animals", "items": ["Reindeer", "penguin", "polar bear", "partridge"]}], [{"group": 1, "name": "Bamboo Eaters", "items": ["Panda", "red panda", "bamboo lemur", "golden snub nosed monkey"]}, {"group": 2, "name": "Striped Animals", "items": ["Zebra", "chipmunk", "bumblebee", "aardwolf"]}, {"group": 3, "name": "Mangrove Animals", "items": ["Blacktip shark", "manatees", "saltwater crocodile", "fish cat"]}, {"group": 4, "name": "Halloween Animals", "items": ["Rat", "x-ray fish", "vampire bat", "goblin shark"]}], [{"group": 1, "name": "Animals w/Unique \"Harry Styles\"", "items": ["Yeti crab", "alpaca", "wolverine frog", "angora rabbit"]}, {"group": 2, "name": "False Crabs", "items": ["Coconut crabs", "hermit crabs", "lobsters", "porcelain crabs"]}, {"group": 3, "name": "Equine Family Members", "items": ["Wild horse", "zebra", "donkey", "mule"]}, {"group": 4, "name": "Animals That eat Coconuts", "items": ["Aye-Aye", "sun bear", "fruit bat", "gorilla"]}], [{"group": 1, "name": "Animals w/ Mythical Animal Names", "items": ["Narwhal", "bearded dragon", "basilisk lizard", "sphinx cat"]}, {"group": 2, "name": "Burrowing Animals", "items": ["Ferrets", "prairie dog", "mole", "burrowing owl"]}, {"group": 3, "name": "Poisonous Animals w/ Bright Colors", "items": ["Poison dart frog", "monarch butterfly", "coral snake", "blue ringed octopus"]}, {"group": 4, "name": "Prairie Birds", "items": ["Prairie chicken", "loggerhead shrike", "prairie falcon", "grasshopper sparrow"]}], [{"group": 1, "name": "Animals That Glide", "items": ["Flying squirrel", "flying snake", "sugar glider", "sifaka lemur"]}, {"group": 2, "name": "Animals Endemic to Madagascar", "items": ["Chameleon", "ring tailed lemur", "fossa", "highland streaked tenrec"]}, {"group": 3, "name": "Mammals w/ Webbed Feet", "items": ["Web-footed tenrec", "platypus", "sea otter", "dachshund"]}, {"group": 4, "name": "Animals That Live in Kelp Forests", "items": ["Sea urchin", "garibaldi", "starfish", "leopard shark"]}], [{"group": 1, "name": "Animals That can Live 100+Years", "items": ["Galapagos tortoise", "immortal jellyfish", "bowhead whale", "greenland shark"]}, {"group": 2, "name": "Galapagos Mammals", "items": ["Sea lion", "dolphin", "humpback whale", "galapagos bat"]}, {"group": 3, "name": "Invasive Animals of Mississippi", "items": ["Wild hog", "house sparrow", "common starling", "nile tilapia"]}, {"group": 4, "name": "Suidae Members", "items": ["Warthog", "babirusa", "bushpig", "domestic pig"]}], [{"group": 1, "name": "Howling Animals", "items": ["Gray wolf", "howler monkey", "coyote", "fox"]}, {"group": 2, "name": "Tusked Animals", "items": ["Narwhal", "elephant", "walrus", "vampire deer"]}, {"group": 3, "name": "Animals w/ Sunscreen", "items": ["Zebrafish", "mantis shrimp", "rhino", "hippo"]}, {"group": 4, "name": "Animals That Spit", "items": ["Alpaca", "llama", "archerfish", "camel"]}], [{"group": 1, "name": "Animals That can Speak", "items": ["Crow", "parrot", "raven", "mynah bird"]}, {"group": 2, "name": "Spiked Animals", "items": ["Hedgehog", "porcupine", "sea urchin", "thorny dragon"]}, {"group": 3, "name": "Australian Mammals", "items": ["Kangaroo", "dingo", "koala", "tasmanian devil"]}, {"group": 4, "name": "Animals w/ Black Tongues", "items": ["Chow chow", "giraffe", "polar bear", "okapi"]}], [{"group": 1, "name": "Hoofed Quadrupeds", "items": ["Horse", "goat", "zebra", "pronghorn antelope"]}, {"group": 2, "name": "Animals w/ Antlers", "items": ["Elk", "mule deer", "moose", "caribou"]}, {"group": 3, "name": "Animals w/ Pouches", "items": ["Possum", "numbat", "seahorse", "kangaroo"]}, {"group": 4, "name": "Animals That Sploot", "items": ["Prairie dog", "domesticated dog", "domesticated cat", "squirrel"]}], [{"group": 1, "name": "Animals That can Jump", "items": ["Serval", "caracal", "klipspringer", "jumping spider"]}, {"group": 2, "name": "Animals That Live in Flocks", "items": ["Sheep", "geese", "parrot", "pigeon"]}, {"group": 3, "name": "Animals w/ Funky Tongues", "items": ["Chameleon", "pangolin", "duck", "blue-tongued skink"]}, {"group": 4, "name": "Trench Animals", "items": ["Barreleye fish", "sea cucumber", "giant isopod", "dumbo octopus"]}], [{"group": 1, "name": "Caribbean Frogs", "items": ["Mountain chicken", "lovely poison frog", "coqui frog", "cuban tree frog"]}, {"group": 2, "name": "African Herbivores", "items": ["Impala", "hippo", "rhino", "giraffe"]}, {"group": 3, "name": "Animals That Clean Others", "items": ["Dentist fish", "cleaner shrimp", "oxpecker", "plover bird"]}, {"group": 4, "name": "Animals w/ Ever Growing Teeth", "items": ["Rabbit", "chipmunk", "babirusa", "walrus"]}], [{"group": 1, "name": "African Predators", "items": ["Lion", "cheetah", "leopard", "African wild dog"]}, {"group": 2, "name": "Animals w/ Shells", "items": ["Cone snail", "green turtle", "armadillo", "oyster"]}, {"group": 3, "name": "Scavengers", "items": ["Vulture", "hyena", "rat", "raven"]}, {"group": 4, "name": "Animals w/ Prehensile Lips", "items": ["Sloth bear", "camel", "manatee", "moose"]}], [{"group": 1, "name": "Striped Animals", "items": ["Tiger", "okapi", "zebra", "coral snake"]}, {"group": 2, "name": "Hibernators", "items": ["Bear", "groundhog", "bat", "squirrel"]}, {"group": 3, "name": "Animals w/ Unique Teeth", "items": ["Leech", "sheepshead fish", "baboon", "piranha"]}, {"group": 4, "name": "Color Changers", "items": ["Chameleon", "mimic octopus", "arctic fox", "anole"]}], [{"group": 1, "name": "Chinese Zodiac Herbivores", "items": ["Oxen", "rabbit", "sheep", "horse"]}, {"group": 2, "name": "Raptor Members", "items": ["Secretary bird", "kestrel", "turkey vulture", "barn owl"]}, {"group": 3, "name": "SuperHero Names", "items": ["Wolverine", "panther", "cat", "ant"]}, {"group": 4, "name": "Pescitarians", "items": ["Sea otter", "kingfisher", "puffin", "great white shark"]}], [{"group": 1, "name": "Brand Animals", "items": ["Puma", "bull", "panda", "dove"]}, {"group": 2, "name": "Bioluminescent Animals", "items": ["Dragonfish", "anglerfish", "firefly", "jellyfish"]}, {"group": 3, "name": "Amazon Rainforest Animals", "items": ["Toucan", "green anaconda", "harpy eagle", "tapir"]}, {"group": 4, "name": "Social Animals", "items": ["Lion", "wolf", "meerkat", "hyena"]}], [{"group": 1, "name": "Sea Mammals", "items": ["Dolphin", "sea lion", "whale", "orca"]}, {"group": 2, "name": "Insectivores", "items": ["Aardvark", "aardwolf", "pangolin", "gecko"]}, {"group": 3, "name": "Monogamous Animals", "items": ["Penguin", "bald eagle", "swan", "seahorse"]}, {"group": 4, "name": "Homophone Animals", "items": ["Bear", "hare", "deer", "flea"]}], [{"group": 1, "name": "Famous Story Characters", "items": ["Wolf", "red fox", "tortoise", "hare"]}, {"group": 2, "name": "Arctic Animals", "items": ["Lemming", "snowy owl", "arctic fox", "polar bear"]}, {"group": 3, "name": "Animals That can Run on Water", "items": ["Basilisk lizard", "fishing spider", "Western grebe", "water strider"]}, {"group": 4, "name": "Echolocaters", "items": ["Bat", "dolphin", "tenrec", "aye aye"]}], [{"group": 1, "name": "Animals That Use Suction", "items": ["Sloth bear", "gecko", "remora fish", "elephant"]}, {"group": 2, "name": "Mountain Animals", "items": ["Mountain goat", "mountain lion", "ibex", "markhor"]}, {"group": 3, "name": "Spotted Animals", "items": ["Ocelot", "spotted skunk", "serval", "chital"]}, {"group": 4, "name": "Animals w/ Deceiving Names", "items": ["Seahorse", "groundhog", "prairie dog", "mongoose"]}], [{"group": 1, "name": "Legless Animals", "items": ["Hognose snake", "legless lizard", "shark", "blue tang"]}, {"group": 2, "name": "Big Cats", "items": ["Leopard", "jaguar", "tiger", "lion"]}, {"group": 3, "name": "Ground Nesters", "items": ["Ostrich", "flamingo", "platypus", "puffin"]}, {"group": 4, "name": "Animals w/ Non Retractable Claws", "items": ["Cheetah", "bear", "wolf", "domesticated dog"]}], [{"group": 1, "name": "Animals w/ Stingers", "items": ["Sea urchin", "jellyfish", "stingray", "lionfish"]}, {"group": 2, "name": "Shore birds", "items": ["Sandpiper", "red knot", "heron", "killdeer"]}, {"group": 3, "name": "Parasitic Birds", "items": ["Cowbird", "cuckoo", "honeyguide", "black-headed duck"]}, {"group": 4, "name": "Eyelid-less Animals", "items": ["Tokay gecko", "day gecko", "giant guitarfish", "goldfish"]}], [{"group": 1, "name": "Animals w/ Wings", "items": ["Flying fish", "Draco lizard", "magpie", "falcon"]}, {"group": 2, "name": "Animals w/ Cheek Pouches", "items": ["Chipmunk", "hamster", "platypus", "squirrel"]}, {"group": 3, "name": "Animals w/ Dewlaps", "items": ["Moose", "iguana", "mastiff dog", "cow"]}, {"group": 4, "name": "Lap Dog Breeds", "items": ["Shih tzu", "Maltese dog", "pug dog", "papillon dog"]}], [{"group": 1, "name": "Livestock", "items": ["Cow", "chicken", "sheep", "pig"]}, {"group": 2, "name": "Pollinators", "items": ["Fruit bat", "bumblebee", "kinkajou", "hummingbird"]}, {"group": 3, "name": "Animals w/ Manes", "items": ["Lion", "horse", "donkey", "zebra"]}, {"group": 4, "name": "Sea Creatures That Anchor Themselves", "items": ["Barnacle", "sea pen", "jellyfish", "coral"]}], [{"group": 1, "name": "Animals w/ Beaks", "items": ["Parrotfish", "hawk", "eagle", "flamingo"]}, {"group": 2, "name": "Birds That Can't Fly", "items": ["Kiwi", "kakapo", "ostrich", "cassowary"]}, {"group": 3, "name": "Birds of Paradise", "items": ["Lophorina", "resplendent quetzal", "astrapia", "riflebird"]}, {"group": 4, "name": "Animals That Grieve", "items": ["Dolphin", "elephant", "orca", "giraffe"]}], [{"group": 1, "name": "Animals w/ Sand Names", "items": ["Sand cat", "sand dollar", "sand piped", "sand viper"]}, {"group": 2, "name": "Antelope Subfamily", "items": ["Gazelle", "springbok", "impala", "Saigon antelope"]}, {"group": 3, "name": "Endurance Runners", "items": ["Pronghorn", "wolf", "horse", "ostrich"]}, {"group": 4, "name": "Female Dominant Animals", "items": ["Hyena", "bonobo", "lemur", "clownfish"]}], [{"group": 1, "name": "Animals w/ Unique Bills", "items": ["Shoebill stork", "spoonbill", "rhinoceros hornbill", "pelican"]}, {"group": 2, "name": "Australian Carnivores", "items": ["Dingo", "Tasmanian devil", "saltwater crocodile", "wedge-tailed eagle"]}, {"group": 3, "name": "Mustelids", "items": ["Ferret", "mink", "ermine", "sea otter"]}, {"group": 4, "name": "Fish That Traverse Land", "items": ["Mudskipper", "walking catfish", "climbing perch", "mangrove rivulus"]}], [{"group": 1, "name": "Blue ___", "items": ["Whale", "tang", "jay", "bird"]}, {"group": 2, "name": "Masked Animals", "items": ["Raccoon", "ferret", "tanuki", "spectacled owl"]}, {"group": 3, "name": "Venomous Snakes", "items": ["Cottonmouth", "death adder", "coral snake", "black mamba"]}, {"group": 4, "name": "Animals That Musk", "items": ["Musk deer", "garter snake", "civet", "musk ox"]}], [{"group": 1, "name": "Animals w/ Trunks", "items": ["Tapir", "elephant", "elephant seal", "saiga antelope"]}, {"group": 2, "name": "Ecosystem Engineers", "items": ["Beaver", "termite", "woodpecker", "prairie dog"]}, {"group": 3, "name": "Animals w/ Fan-tails", "items": ["Peacock", "turkey", "lyrebird", "great argus pheasant"]}, {"group": 4, "name": "Popular Cereal Mascots", "items": ["Tiger", "rabbit", "toucan", "honeybee"]}], [{"group": 1, "name": "Animals w/ Rosettes", "items": ["Jaguar", "clouded leopard", "amur leopard", "snow leopard"]}, {"group": 2, "name": "Wild Dogs", "items": ["Wolf", "jackal", "dhole", "fox"]}, {"group": 3, "name": "Common Household Pets", "items": ["Dog", "cat", "goldfish", "parakeet"]}, {"group": 4, "name": "Backyard Birds in Mississippi", "items": ["Cardinal", "mockingbird", "mourning dove", "bluebird"]}], [{"group": 1, "name": "Scaled Animals", "items": ["Pangolin", "bullsnake", "bearded dragon", "armadillo"]}, {"group": 2, "name": "Black and White Animals", "items": ["Panda", "skunk", "zebra", "tapir"]}, {"group": 3, "name": "Rainbow Animals", "items": ["Rainbow fish", "rainbow lorikeet", "rainbow trout", "rainbow crab"]}, {"group": 4, "name": "Animals w/ Blubber", "items": ["Seal", "whale", "walrus", "polar bear"]}], [{"group": 1, "name": "Nocturnal Marsupials", "items": ["Sugar glider", "possum", "quoll", "koala"]}, {"group": 2, "name": "Easter Animals", "items": ["Rabbit", "bilby", "chicken", "lamb"]}, {"group": 3, "name": "Egg Layers", "items": ["Corn snake", "osprey", "platypus", "trout"]}, {"group": 4, "name": "Animals w/ Fruit Names", "items": ["Lemon shark", "banana slug", "coconut crab", "kiwi"]}], [{"group": 1, "name": "Golden Animals", "items": ["Goldfish", "golden bamboo lemur", "golden snub nosed monkey", "golden eagle"]}, {"group": 2, "name": "Poisonous Animals", "items": ["Poison dart frog", "pufferfish", "loris", "toad"]}, {"group": 3, "name": "Animals w/ Exoskeletons", "items": ["Lobster", "crab", "beetle", "scorpion"]}, {"group": 4, "name": "Animals That Chirp", "items": ["Cheetah", "cricket", "cardinal bird", "robin"]}], [{"group": 1, "name": "Crocodilians", "items": ["Crocodile", "alligator", "gharial", "caiman"]}, {"group": 2, "name": "\"Slimy\" Animals", "items": ["Parrotfish", "slug", "snail", "blobfish"]}, {"group": 3, "name": "Animals w/ Repeating Names", "items": ["Chow chow dog", "aye aye", "pica pica", "bubo bubo"]}, {"group": 4, "name": "Eyeless Animals", "items": ["Star-nosed mole", "naked mole rat", "blind axolotl", "red brittle starfish"]}], [{"group": 1, "name": "Corvids", "items": ["Crow", "raven", "magpie", "jackdaw"]}, {"group": 2, "name": "Gray Mammals", "items": ["Gray wolf", "koala", "gray fox", "African gray parrot"]}, {"group": 3, "name": "Blue Animals", "items": ["Blue iguana", "hyacinth macaw", "Ulysses butterfly", "blue heron"]}, {"group": 4, "name": "Animals that Can Read", "items": ["Potbelly pig", "chimpanzee", "elephant", "domesticated dog"]}], [{"group": 1, "name": "Bears", "items": ["Polar bear", "grizzly bear", "black bear", "sun bear"]}, {"group": 2, "name": "Filter Feeders", "items": ["Whale shark", "flamingo", "basking whale", "bowhead whale"]}, {"group": 3, "name": "Arctic Birds", "items": ["Arctic tern", "auk", "penguin", "snowy owl"]}, {"group": 4, "name": "Animals Used for Transportation", "items": ["Horse", "donkey", "mule", "alpaca"]}], [{"group": 1, "name": "Animals w/ Long Eyelashes", "items": ["Eyelash viper", "secretary bird", "camel", "ostrich"]}, {"group": 2, "name": "Rainforest Mammals", "items": ["Jaguar", "Amazon river dolphin", "capybara", "ocelot"]}, {"group": 3, "name": "Animals w/ Humps", "items": ["American Bison", "moose", "llama", "European bison"]}, {"group": 4, "name": "Candy Animals", "items": ["Bear", "worm", "bunny", "fish"]}], [{"group": 1, "name": "Desert Herbivores", "items": ["Jack rabbit", "sulcata tortoise", "kangaroo rat", "pack rat"]}, {"group": 2, "name": "\"Wolves\"", "items": ["Wolf hawk", "wolf spider", "aardwolf", "wolf eel"]}, {"group": 3, "name": "Baby Animals Called Pups", "items": ["Dingo", "walrus", "shark", "bat"]}, {"group": 4, "name": "Animals w/ Lucky Names", "items": ["Ladybug", "horseshoe crab", "lesser horseshoe bat", "turkish angora cat"]}], [{"group": 1, "name": "Nocturnal Birds", "items": ["Owl", "nightjar", "potoo", "frogmouth"]}, {"group": 2, "name": "Hawks", "items": ["Broad winged hawk", "Cooper's hawk", "harrier hawk", "osprey"]}, {"group": 3, "name": "Tailless Animals", "items": ["Kiwi", "capybara", "chimpanzee", "guinea pig"]}, {"group": 4, "name": "Baby Animals Called Calves", "items": ["Dolphin", "cow", "moose", "ox"]}], [{"group": 1, "name": "Green Animals", "items": ["Tree frog", "basilisk lizard", "Luna moth", "emerald tree boa"]}, {"group": 2, "name": "Animals w/ Horse Names", "items": ["Horseshoe crab", "sea horse", "horse", "horsefly"]}, {"group": 3, "name": "Silver ___", "items": ["Silverfish", "silver pheasant", "silver fox", "silver fox rabbit"]}, {"group": 4, "name": "Animals That Spurt Water Jets", "items": ["Archerfish", "humuhumunukunukuapua'a", "giant pacific octopus", "common octopus"]}], [{"group": 1, "name": "Mimickers", "items": ["Mimic octopus", "mockingbird", "monarch butterfly", "katydid"]}, {"group": 2, "name": "North American Ungulates", "items": ["Pronghorn", "American bison", "moose", "mule deer"]}, {"group": 3, "name": "Animals That Whistle", "items": ["Dolphin", "robin", "Olive-sided Flycatcher", "pigeon guillemot"]}, {"group": 4, "name": "Animals That Carry Their Offspring in Mouth", "items": ["Saltwater crocodile", "Nile crocodile", "alligator", "jawfish"]}], [{"group": 1, "name": "Ocean Mammals", "items": ["Orca", "whale", "sea otter", "vaquita"]}, {"group": 2, "name": "Animals That \"Piggyback\" on Other Species", "items": ["Remora fish", "oxpecker", "tick", "spiny lobster"]}, {"group": 3, "name": "\"Bald\" Birds", "items": ["Black vulture", "turkey vulture", "bald eagle", "white backed vulture"]}, {"group": 4, "name": "River Animals", "items": ["River otter", "beaver", "pink river dolphin", "American alligator"]}], [{"group": 1, "name": "Crested Animals", "items": ["Crested porcupine", "crested gecko", "cassowary", "gray crowned crane"]}, {"group": 2, "name": "Animals That Use Tails as Blanket", "items": ["Red fox", "gray fox", "gray squirrel", "red squirrel"]}, {"group": 3, "name": "Flat/ \"Pancake\" Animals", "items": ["Stingray", "flat headed cat", "manta ray", "flounder"]}, {"group": 4, "name": "Fake Fish", "items": ["Jellyfish", "silverfish", "cuttlefish", "starfish"]}], [{"group": 1, "name": "Reef Dwellers", "items": ["Pygmy seahorse", "frogfish", "parrotfish", "clownfish"]}, {"group": 2, "name": "Guard Dogs", "items": ["German shepherd", "Belgian malinois", "Rottweiler", "Doberman pinscher"]}, {"group": 3, "name": "Curly Furred Animals", "items": ["Poodle", "alpaca", "angora goat", "frillback pigeon"]}, {"group": 4, "name": "Animals That can Roll Into a Ball", "items": ["Armadillo", "hedgehog", "pangolin", "roly poly"]}], [{"group": 1, "name": "Tropical Animals", "items": ["Harpy eagle", "spider monkey", "hummingbird", "macaw"]}, {"group": 2, "name": "Tide Pool Inhabitants", "items": ["Sea anemone", "limpet", "mussel", "dogwhelk"]}, {"group": 3, "name": "Animals w/ Veggie Names", "items": ["Tomato frog", "sea cucumber", "cauliflower jellyfish", "potato grouper"]}, {"group": 4, "name": "Animals That Spread Oaks", "items": ["Gray squirrel", "ground squirrel", "blue jay", "steller's jay"]}], [{"group": 1, "name": "Swamp Animals", "items": ["Alligator", "black swamp snake", "marsh rabbit", "alligator snapping turtle"]}, {"group": 2, "name": "Arctic Swimmers", "items": ["Narwhal", "walrus", "seal", "penguin"]}, {"group": 3, "name": "Desert Snakes", "items": ["Horned viper", "sand viper", "diamondback rattlesnake", "desert king snake"]}, {"group": 4, "name": "Animals That Pant", "items": ["Domesticated dog", "wolf", "domesticated cat", "pig"]}], [{"group": 1, "name": "\"Bull\" Animals", "items": ["Bullfrog", "bulldog", "bull terrier", "eurasian bullfinch"]}, {"group": 2, "name": "Aquatic Snakes", "items": ["Coral reef snake", "sea krait", "cottonmouth", "green water snake"]}, {"group": 3, "name": "Alpine Tundra Animals", "items": ["Himalayan snake", "pika", "mountain goat", "marmot"]}, {"group": 4, "name": "Animals of The Forest Floor", "items": ["Jaguar", "okapi", "anteater", "leafcutter ant"]}], [{"group": 1, "name": "Animals w/ Water Names", "items": ["Water buffalo", "water snake", "Portuguese water dog", "American water spaniel"]}, {"group": 2, "name": "Animals Poisonous to Touch", "items": ["Golden poison dart frog", "puffer fish", "pitohui", "strawberry poison dart frog"]}, {"group": 3, "name": "Geckos", "items": ["Tokay gecko", "crested gecko", "day gecko", "leopard gecko"]}, {"group": 4, "name": "Animals That Can't Run", "items": ["Sloth", "kangaroo", "legless lizard", "bullsnake"]}], [{"group": 1, "name": "Purple Animals", "items": ["Purple martin", "purple emperor", "violet-backed starling", "purple heron"]}, {"group": 2, "name": "Fish", "items": ["Salmon", "vermilion snapper", "spanish mackerel", "pigfish"]}, {"group": 3, "name": "Animals That Spend 12+ Hours Asleep", "items": ["Koala", "lion", "domesticated cat", "tiger"]}, {"group": 4, "name": "Leslie's Favs/ Penguins", "items": ["Macaroni penguin", "king penguin", "southern penguin", "gentoo penguin"]}], [{"group": 1, "name": "Mutualism Pairs", "items": ["Honey badger", "honeyguide", "oxpecker", "rhino"]}, {"group": 2, "name": "Animals That eat Garbage", "items": ["Raccoon", "coyote", "opossum", "seagull"]}, {"group": 3, "name": "Drummers", "items": ["Palm cockatoos", "Pileated woodpecker", "great spotted woodpecker", "northern flicker"]}, {"group": 4, "name": "Mixotrophs", "items": ["Yellow spotted salamander", "elysia chlorotica", "pea aphid", "sacoglossa"]}], [{"group": 1, "name": "Baby Animals Called Cubs", "items": ["Tiger", "lion", "grizzly bear", "polar bear"]}, {"group": 2, "name": "Hopping Animals", "items": ["Rabbit", "hare", "klipspringer", "kangaroo"]}, {"group": 3, "name": "Animals w/ Striped Tails", "items": ["Ring tailed cat", "ring tailed lemur", "raccoon", "coati"]}, {"group": 4, "name": "Saltwater & Freshwater Animals", "items": ["Salmon", "bull shark", "saltwater crocodile", "eel"]}], [{"group": 1, "name": "Nocturnal Birds", "items": ["Owl", "nightjar", "potoo", "frogmouth"]}, {"group": 2, "name": "Hawks", "items": ["Broad winged hawk", "Cooper's hawk", "harrier hawk", "osprey"]}, {"group": 3, "name": "Tailless Animals", "items": ["Kiwi", "capybara", "chimpanzee", "guinea pig"]}, {"group": 4, "name": "Baby Animals Called Calves", "items": ["Dolphin", "cow", "moose", "ox"]}], [{"group": 1, "name": "Pigs", "items": ["Pigfish", "Guinea pig", "sea pig", "domesticate pig"]}, {"group": 2, "name": "Upper Ocean Dwellers", "items": ["Surfing snail", "sea skater", "sunfish", "swordfish"]}, {"group": 3, "name": "Baby Animals Called Kits/ Kittens", "items": ["Domesticated cat", "genet", "fox", "caracal"]}, {"group": 4, "name": "Animals That can Zap", "items": ["Electric eel", "torpedo ray", "electric catfish", "elephant nose fish"]}], [{"group": 1, "name": "Fish Eating Birds", "items": ["Osprey", "heron", "albatross", "puffin"]}, {"group": 2, "name": "Blood Suckers", "items": ["Vampire bat", "mosquito", "lamprey", "vampire finch"]}, {"group": 3, "name": "Squids", "items": ["Colossal squid", "humboldt squid", "common squid", "caribbean reef squid"]}, {"group": 4, "name": "Detritivores", "items": ["Millipede", "worm", "vampire squid", "fiddler crab"]}], [{"group": 1, "name": "Red Animals", "items": ["Red fox", "red wolf", "red panda", "red lory"]}, {"group": 2, "name": "Australian Canids", "items": ["Dingo", "australian cattle dog", "australian kelpie", "australian terrier"]}, {"group": 3, "name": "Amphibious Animals", "items": ["Snail", "axolotl", "green anaconda", "capybara"]}, {"group": 4, "name": "\"Devil\" Animals", "items": ["Tasmanian devil", "thorny devil", "devil fish", "sand devil"]}], [{"group": 1, "name": "Songbirds", "items": ["Thrush", "cardinal", "finch", "sparrow"]}, {"group": 2, "name": "Hairless Land Animals", "items": ["Naked mole rat", "worm", "sphynx cat", "donskoy cat"]}, {"group": 3, "name": "Fish w/ Venomous Spines", "items": ["Lionfish", "stonefish", "scorpionfish", "weever fish"]}, {"group": 4, "name": "Sea Creatures w/ Beaks", "items": ["Hawksbill sea turtle", "parrotfish", "squid", "octopus"]}], [{"group": 1, "name": "Star Animals", "items": ["Starfish", "starling", "star-nose mole", "brittle star"]}, {"group": 2, "name": "Wood/ Bark Eating Animals", "items": ["Beaver", "wood-eating catfish", "porcupine", "termites"]}, {"group": 3, "name": "Hydrothermal Vent Animals", "items": ["Yeti crab", "tube worm", "vent octopus", "giant isopod"]}, {"group": 4, "name": "Polyphyodonts", "items": ["Shark", "crocodile", "elephant", "manatee"]}], [{"group": 1, "name": "Formosan Animals", "items": ["Formosan black bear", "formosan mountain dog", "formosan rock macaque", "formosan ferret badger"]}, {"group": 2, "name": "Aquatic Pescetarians", "items": ["Orca", "shark", "sea lion", "dolphin"]}, {"group": 3, "name": "Night ___", "items": ["Night snake", "night lizard", "nightjar", "common nightingale"]}, {"group": 4, "name": "Oldest Species", "items": ["Horseshoe crab", "sea cucumber", "sponges", "jellyfish"]}], [{"group": 1, "name": "Body Part Fish", "items": ["Lungfish", "sheepshead fish", "elephantnose", "cownose ray fish"]}, {"group": 2, "name": "Vertical Swimmers", "items": ["Giant oarfish", "seahorse", "razorfish", "russell's oarfish"]}, {"group": 3, "name": "Animals w/ Moustaches", "items": ["Southern white-faced owl", "emperor tamarin", "bearded pig", "bearded collie"]}, {"group": 4, "name": "SuperHero Names", "items": ["Wolverine", "panther", "cat", "ant"]}], [{"group": 1, "name": "Fake Leopards", "items": ["Leopard seal", "leopard gecko", "leopard tortoise", "long-nosed leopard lizard"]}, {"group": 2, "name": "Birds That Climb", "items": ["Eurasian tree creepers", "hoatzin", "woodpecker", "brown creeper"]}, {"group": 3, "name": "Cephalopods", "items": ["Cuttlefish", "giant pacific octopus", "dumbo octopus", "nautilus"]}, {"group": 4, "name": "Catastrophic Molters", "items": ["Elephant seal", "king penguin", "African penguin", "little penguin"]}], [{"group": 1, "name": "King Animals", "items": ["King cobra", "king salmon", "king vulture", "king snake"]}, {"group": 2, "name": "Bugs w/ Queens", "items": ["Ants", "termites", "bee", "wasp"]}, {"group": 3, "name": "Animals w/ Tree Names", "items": ["Tree kangaroo", "tree hopper", "green tree python", "tree frog"]}, {"group": 4, "name": "Lurers", "items": ["Anglerfish", "frog fish", "spider-tailed horned viper", "wobbegong"]}], [{"group": 1, "name": "Grass ___", "items": ["Grasshopper", "grass snake", "grass skipper", "grasshopper mouse"]}, {"group": 2, "name": "Animals w/ Mohawks", "items": ["Sulphur crested cockatoo", "crowned crane", "visayan warty pig", "curassow"]}, {"group": 3, "name": "Animals w/ Tooth Combs", "items": ["Ring tailed lemur", "colugo", "slow loris", "aye-aye"]}, {"group": 4, "name": "Animals w/ Non-red Blood", "items": ["Crocodile fish", "horseshoe crab", "octopus", "worm"]}], [{"group": 1, "name": "Taiwan ___", "items": ["Taiwan blue magpie", "Taiwan barbet", "Taiwan whistling thrush", "Taiwan serow"]}, {"group": 2, "name": "Black ___", "items": ["Black bear", "black saddleback skimmer", "black mamba", "black swan"]}, {"group": 3, "name": "Swiftest Mammals", "items": ["Cheetah", "quarter horse", "pronghorn", "springbok"]}, {"group": 4, "name": "Animal Gardeners", "items": ["Termite", "brown-throated sloth", "three toed sloth", "bowerbird"]}], [{"group": 1, "name": "See-Through Animals", "items": ["Glass frog", "glass shrimp", "glasswing butterfly", "jellyfish"]}, {"group": 2, "name": "Pygmy Animals", "items": ["Pygmy seahorse", "Pygmy hippo", "Pygmy owl", "Pygmy goat"]}, {"group": 3, "name": "Animals That Ride Whales", "items": ["Whalesucker", "barnacle", "whale louse", "slender suckerfish"]}, {"group": 4, "name": "Reptiles That Don't Brumate", "items": ["Boa constrictors", "Burmese python", "iguana", "ball python"]}], [{"group": 1, "name": "Christmas ___", "items": ["Christmas boobook", "Christmas Island crab", "Christmas tree worm", "Christmas frigatebird"]}, {"group": 2, "name": "Snow ___", "items": ["Snow leopard", "snowshoe hare", "snow goose", "snowy owl"]}, {"group": 3, "name": "Predators That Wrap Prey", "items": ["Orb weavers", "python", "boa constrictor", "garden spider"]}, {"group": 4, "name": "Mistletoe Eaters", "items": ["Mistletoebird", "great purple hairstreak", "porcupine", "deer"]}], [{"group": 1, "name": "Glass ___", "items": ["Glass frog", "glass squid", "glass shrimp", "glass octopus"]}, {"group": 2, "name": "Suckers", "items": ["Remora fish", "lumpsucker", "shark sucker", "longnose sucker"]}, {"group": 3, "name": "Animals w/ White Tail Tips", "items": ["Fox", "border collie", "giant white tailed rat", "common whitetail"]}, {"group": 4, "name": "Animals That Use Tools to Access Food", "items": ["Sea otter", "chimpanzee", "elephant", "dolphin"]}], [{"group": 1, "name": "Painted Animals", "items": ["Painted turtle", "painted bat", "African painted dog", "painted lichen moth"]}, {"group": 2, "name": "Animals That Stink", "items": ["Hoatzin", "stink bug", "hooded skunks", "spotted skunks"]}, {"group": 3, "name": "Animals Endemic to Hawaii", "items": ["Hawaiian honeycreeper", "Hawaiian monk seal", "Hawaiian hawk", "Hawaiian stilt"]}, {"group": 4, "name": "Birds That Produce Milk", "items": ["Pigeon", "flamingo", "emperor penguin", "king penguin"]}], [{"group": 1, "name": "Saddlebacks", "items": ["Black saddleback skimmer", "saddleback clownfish", "saddleback tamarin", "tieke bird"]}, {"group": 2, "name": "Animals w/ Giant Mouths", "items": ["Potoo", "goblin shark", "gulper eel", "frogmouth"]}, {"group": 3, "name": "Nonvenomous Venom Users", "items": ["Clownfish", "rainbow blanket octopus", "pom pom fish", "slender yellowtail kingfish"]}, {"group": 4, "name": "Gastrolith Eaters", "items": ["Crocodile", "alligator", "chicken", "penguin"]}], [{"group": 1, "name": "\"Hammer\" Animals", "items": ["Great hammerhead shark", "hammer-headed bat", "Scalloped hammerhead", "hammerhead worm"]}, {"group": 2, "name": "Small Felines", "items": ["Margay", "ocelot", "tiger cat", "sand cat"]}, {"group": 3, "name": "Iridescent Animals", "items": ["Iridescent shark", "sunbeam snake", "rainbow boa", "rosemary beetles"]}, {"group": 4, "name": "Naturally Smiling Animals", "items": ["Quokka", "bottlenose dolphin", "amazon river dolphin", "domesticated dog"]}], [{"group": 1, "name": "Fish w/ Extended Rostrums", "items": ["Knifetooth sawfish", "small tooth sawfish", "Chinese paddlefish", "American paddlefish"]}, {"group": 2, "name": "Fake Snakes", "items": ["Legless lizard", "spicebush swallowtail caterpillar", "red helen swallowtail caterpillar", "worm"]}, {"group": 3, "name": "Emperors", "items": ["Emperor tamarin", "emperor penguin", "purple emperor", "lesser purple emperor"]}, {"group": 4, "name": "Even-Toed Ungulates", "items": ["Dolphin", "whale", "porpoise", "moose"]}], [{"group": 1, "name": "Thorny Animals", "items": ["Thorny devil", "thorn bug", "crown of thorns starfish", "thorny skate"]}, {"group": 2, "name": "Fake dogs", "items": ["Painted dog", "bush dog", "prairie dog", "raccoon dog"]}, {"group": 3, "name": "Cervidae Members", "items": ["White-tail deer", "red deer", "elk", "moose"]}, {"group": 4, "name": "Odd Toed Ungulates", "items": ["Horse", "donkey", "mule", "tapir"]}], [{"group": 1, "name": "Eurasian Animals", "items": ["Eurasian eagle owl", "Eurasian lynx", "Eurasian wolf", "Eurasian jay"]}, {"group": 2, "name": "Animals w/ \"Big\" Names", "items": ["Colossal squid", "giant panda", "Goliath beetle", "Chinese giant salamander"]}, {"group": 3, "name": "Torpor Users", "items": ["Dormouse", "black bear", "hummingbird", "badger"]}, {"group": 4, "name": "Animals w/ \"Fantasy\" Names", "items": ["Chimaeras fish", "bearded dragon", "basilisk lizard", "sphinx cat"]}], [{"group": 1, "name": "\"Lesser\" Bats", "items": ["Lesser bamboo bat", "lesser dawn bat", "lesser ghost bat", "lesser horseshoe bat"]}, {"group": 2, "name": "Dwarf Animals", "items": ["Lesser dwarf shrew", "dwarf burmese python", "mindoro dwarf buffalo", "cape dwarf gecko"]}, {"group": 3, "name": "Cartilaginous Fish", "items": ["Tiger shark", "bull shark", "eagle ray", "manta ray"]}, {"group": 4, "name": "Animals w/ Self Awareness", "items": ["Bonobo", "dolphin", "elephant", "magpie"]}], [{"group": 1, "name": "Animals That can Jump", "items": ["Serval", "caracal", "klipspringer", "jumping spider"]}, {"group": 2, "name": "Animals That Live in Flocks", "items": ["Sheep", "geese", "parrot", "pigeon"]}, {"group": 3, "name": "Animals w/ Funky Tongues", "items": ["Chameleon", "pangolin", "duck", "blue-tongued skink"]}, {"group": 4, "name": "Trench Animals", "items": ["Barreleye fish", "sea cucumber", "giant isopod", "dumbo octopus"]}], [{"group": 1, "name": "Bamboo Eaters", "items": ["Panda", "red panda", "bamboo lemur", "golden snub nosed monkey"]}, {"group": 2, "name": "Striped Animals", "items": ["Zebra", "chipmunk", "bumblebee", "aardwolf"]}, {"group": 3, "name": "Mangrove Animals", "items": ["Blacktip shark", "manatees", "saltwater crocodile", "fish cat"]}, {"group": 4, "name": "Halloween Animals", "items": ["Rat", "x-ray fish", "vampire bat", "goblin shark"]}], [{"group": 1, "name": "Howling Animals", "items": ["Gray wolf", "howler monkey", "coyote", "fox"]}, {"group": 2, "name": "Tusked Animals", "items": ["Narwhal", "elephant", "walrus", "vampire deer"]}, {"group": 3, "name": "Animals w/ Sunscreen", "items": ["Zebrafish", "mantis shrimp", "rhino", "hippo"]}, {"group": 4, "name": "Animals That Spit", "items": ["Alpaca", "llama", "archerfish", "camel"]}], [{"group": 1, "name": "Caribbean Frogs", "items": ["Mountain chicken", "lovely poison frog", "coqui frog", "cuban tree frog"]}, {"group": 2, "name": "African Herbivores", "items": ["Impala", "hippo", "rhino", "giraffe"]}, {"group": 3, "name": "Animals That Clean Others", "items": ["Dentist fish", "cleaner shrimp", "oxpecker", "plover bird"]}, {"group": 4, "name": "Animals w/ Ever Growing Teeth", "items": ["Rabbit", "chipmunk", "babirusa", "walrus"]}], [{"group": 1, "name": "Rats", "items": ["Fancy rat", "brown rat", "black rat", "slender rat"]}, {"group": 2, "name": "Short Animals", "items": ["Short-eared owl", "German shorthaired pointer", "American shorthair", "British shorthair"]}, {"group": 3, "name": "Microscopic Animals", "items": ["Dust mite", "spider mite", "tardigrade", "rotifers"]}, {"group": 4, "name": "Long Distance Attackers", "items": ["Archerfish", "spitting cobra", "bombardier beetle", "chameleon"]}], [{"group": 1, "name": "Chinese Zodiac Herbivores", "items": ["Oxen", "rabbit", "sheep", "horse"]}, {"group": 2, "name": "Raptor Members", "items": ["Secretary bird", "kestrel", "turkey vulture", "barn owl"]}, {"group": 3, "name": "Fake Frogs", "items": ["Hairy frogfish", "giant frogfish", "frogmouth", "toad"]}, {"group": 4, "name": "Pescitarians", "items": ["Sea otter", "kingfisher", "puffin", "great white shark"]}], [{"group": 1, "name": "Jays", "items": ["Blue jay", "steller's jay", "violaceous jay", "yucatan jay"]}, {"group": 2, "name": "Animals w/ 14 Legs", "items": ["Bathynomus decemsprinosus", "Bathynomus doederleini", "Bathynomus giganteus", "Bathynomus yucatanensis"]}, {"group": 3, "name": "Animals That Give Gifts", "items": ["Bonobo", "crow", "dolphin", "domesticated cat"]}, {"group": 4, "name": "Can be Found on All 7 Continents", "items": ["Human", "seal", "springtail", "tardigrade"]}], [{"group": 1, "name": "Bioluminescent Animals", "items": ["Dragonfish", "anglerfish", "firefly", "jellyfish"]}, {"group": 2, "name": "Rainforest Animals", "items": ["Toucan", "green anaconda", "harpy eagle", "tapir"]}, {"group": 3, "name": "Social Animals", "items": ["Lion", "wolf", "meerkat", "hyena"]}, {"group": 4, "name": "Brand Name Animals", "items": ["Puma", "bull", "panda", "dove"]}], [{"group": 1, "name": "Animals That Use Suction", "items": ["Sloth bear", "gecko", "remora fish", "elephant"]}, {"group": 2, "name": "Mountain Animals", "items": ["Mountain goat", "mountain lion", "ibex", "markhor"]}, {"group": 3, "name": "Spotted Animals", "items": ["Ocelot", "spotted skunk", "serval", "chital"]}, {"group": 4, "name": "Animals w/ Deceiving Names", "items": ["Seahorse", "groundhog", "prairie dog", "mongoose"]}], [{"group": 1, "name": "Animals w/ Wings", "items": ["Flying fish", "Draco lizard", "magpie", "falcon"]}, {"group": 2, "name": "Animals w/ Cheek Pouches", "items": ["Chipmunk", "hamster", "platypus", "squirrel"]}, {"group": 3, "name": "Animals w/ Dewlaps", "items": ["Moose", "iguana", "mastiff dog", "cow"]}, {"group": 4, "name": "Lap Dog Breeds", "items": ["Shih tzu", "Maltese dog", "pug dog", "papillon dog"]}], [{"group": 1, "name": "Sharks", "items": ["Bull shark", "great white shark", "hammerhead shark", "lemon shark"]}, {"group": 2, "name": "Asexual Animals", "items": ["Komodo dragon", "fresh-water polyp", "Hydra viridissima", "new mexico whiptail lizard"]}, {"group": 3, "name": "Animals w/ Vestigial Structures", "items": ["Blue whale", "emperor penguin", "corn snake", "human"]}, {"group": 4, "name": "Precocial Animals", "items": ["Snowshoe hare", "white tailed deer", "pronghorn antelope", "reticulated giraffe"]}], [{"group": 1, "name": "Animals w/ Beaks That Aren't Birds", "items": ["Parrotfish", "giant pacific octopus", "blue ringed octopus", "mimic octopus"]}, {"group": 2, "name": "Birds That Can't Fly", "items": ["Kiwi", "kakapo", "ostrich", "cassowary"]}, {"group": 3, "name": "Birds of Paradise", "items": ["Lophorina", "resplendent quetzal", "astrapia", "riflebird"]}, {"group": 4, "name": "Animals That Grieve", "items": ["Dolphin", "elephant", "orca", "giraffe"]}], [{"group": 1, "name": "Bears", "items": ["Polar bear", "grizzly bear", "black bear", "sun bear"]}, {"group": 2, "name": "Filter Feeders", "items": ["Whale shark", "flamingo", "basking whale", "bowhead whale"]}, {"group": 3, "name": "Arctic Birds", "items": ["Arctic tern", "auk", "penguin", "snowy owl"]}, {"group": 4, "name": "Chelicerata Members", "items": ["Horseshoe crab", "scorpion", "orb weaver spider", "sea spider"]}], [{"group": 1, "name": "Ocean Mammals", "items": ["Orca", "whale", "sea otter", "vaquita"]}, {"group": 2, "name": "Animals That \"Piggyback\" on Other Species", "items": ["Remora fish", "oxpecker", "tick", "spiny lobster"]}, {"group": 3, "name": "\"Bald\" Birds", "items": ["Black vulture", "turkey vulture", "bald eagle", "white backed vulture"]}, {"group": 4, "name": "River Animals", "items": ["River otter", "beaver", "pink river dolphin", "American alligator"]}], [{"group": 1, "name": "Smooth Animals", "items": ["Smooth lungfish", "smooth green snake", "smooth collie", "smooth-coated otter"]}, {"group": 2, "name": "Diurnal Bats", "items": ["Black-eared flying fox", "caroline flying fox", "mauritian flying fox", "seychelles fruit bat"]}, {"group": 3, "name": "Waterproof Animals", "items": ["Sea otter", "common otter", "wood duck", "Canada goose"]}, {"group": 4, "name": "Animals w/ 3+ Cones", "items": ["Longfin damselfish", "goldfish", "bee", "mantis shrimp"]}], [{"group": 1, "name": "Crested Animals", "items": ["Crested porcupine", "crested gecko", "cassowary", "gray crowned crane"]}, {"group": 2, "name": "Animals That Use Tails as Blanket", "items": ["Red fox", "gray fox", "gray squirrel", "red squirrel"]}, {"group": 3, "name": "Flat/ \"Pancake\" Animals", "items": ["Stingray", "flat headed cat", "manta ray", "flounder"]}, {"group": 4, "name": "Fake Fish", "items": ["Jellyfish", "silverfish", "cuttlefish", "starfish"]}], [{"group": 1, "name": "Green Animals", "items": ["Tree frog", "basilisk lizard", "Luna moth", "emerald tree boa"]}, {"group": 2, "name": "Animals w/ Horse Names", "items": ["Horseshoe crab", "sea horse", "horse", "horsefly"]}, {"group": 3, "name": "Silver ___", "items": ["Silverfish", "silver pheasant", "silver fox", "silver fox rabbit"]}, {"group": 4, "name": "Animals That Spurt Water Jets", "items": ["Archerfish", "humuhumunukunukuapua'a", "giant pacific octopus", "common octopus"]}], [{"group": 1, "name": "Wool Yielders", "items": ["Alpaca", "vicuna", "sheep", "musk ox"]}, {"group": 2, "name": "Animals w/ Funny Names", "items": ["Blue footed booby", "hellbender", "bastard eel", "donkey"]}, {"group": 3, "name": "Non Mammalian Milk Producers", "items": ["Jumping spider", "great white shark", "emperor penguin", "pacific beetle cockroach"]}, {"group": 4, "name": "Unihemispheric Sleepers", "items": ["Bottlenose dolphin", "beluga whale", "Amazonian manatee", "peregrine falcon"]}], [{"group": 1, "name": "Rodents", "items": ["Capybara", "beaver", "kangaroo rat", "wood mouse"]}, {"group": 2, "name": "Toxic Birds", "items": ["Hooded pitohui", "bronzewing pigeon", "little shrike thrush", "red warbler"]}, {"group": 3, "name": "Animals w/ Elastic Jaws", "items": ["Slingjaw wrasse", "goblin shark", "hairy frogfish", "giant frogfish"]}, {"group": 4, "name": "Animals That can Live 100+ Years", "items": ["Galapagos tortoise", "immortal jellyfish", "bowhead whale", "greenland shark"]}], [{"group": 1, "name": "Cape ___", "items": ["Cape buffalo", "cape dwarf gecko", "cape fox", "cape porcupine"]}, {"group": 2, "name": "(Natural) Apex Predators", "items": ["Peregrine falcon", "komodo dragon", "bengal tiger", "orca"]}, {"group": 3, "name": "Collectors", "items": ["Cichlid", "red squirrel", "blue jay", "chipmunk"]}, {"group": 4, "name": "Altricial Animals", "items": ["Human", "domesticated cat", "domesticated dog", "red kangaroo"]}], [{"group": 1, "name": "Oriental ___", "items": ["Oriental shorthair cat", "oriental cockroach", "oriental scops owl", "oriental dwarf kingfisher"]}, {"group": 2, "name": "Constrictor Snakes", "items": ["Ball python", "burmese python", "Indian python", "boa constrictor"]}, {"group": 3, "name": "Herbivores", "items": ["Black rhino", "przewalski's horse", "jack rabbit", "groundhog"]}, {"group": 4, "name": "Semialtricial Animals", "items": ["Blue heron", "green heron", "osprey", "eurasian goshawk"]}], [{"group": 1, "name": "Foxes", "items": ["Arctic fox", "red fox", "fennec fox", "gray fox"]}, {"group": 2, "name": "Horned Non Mammals", "items": ["Horned adder", "great horned owl", "horned lizard", "Argentine horned frog"]}, {"group": 3, "name": "Wattled Birds", "items": ["Wild turkey", "northern cassowary", "king vulture", "amazonian umbrellabird"]}, {"group": 4, "name": "Animals w/ Kitchen Utensil Names", "items": ["Cookiecutter shark", "spoon worm", "black ghost knifefish", "fork-marked lemur"]}], [{"group": 1, "name": "Storks", "items": ["White stork", "wood stork", "painted stork", "oriental stork"]}, {"group": 2, "name": "Wrens", "items": ["Carolina wren", "house wren", "eurasian wren", "winter wren"]}, {"group": 3, "name": "Galapague\u00f1os Animals", "items": ["Galapagos giant tortoise", "galapagos hawk", "medium ground finch", "common cactus finch"]}, {"group": 4, "name": "Adding Animals", "items": ["Addax", "puff adder", "common death adder", "desert death adder"]}], [{"group": 1, "name": "Lemurs", "items": ["Ring tailed lemur", "aye aye", "golden bamboo lemur", "silky sifaka"]}, {"group": 2, "name": "Finches", "items": ["Medium ground finch", "common cactus finch", "pine grosbeak", "evening grosbeak"]}, {"group": 3, "name": "Unmovable Animals", "items": ["Gooseneck barnacle", "acorn barnacle", "clonal anemone", "sebae anemone"]}, {"group": 4, "name": "Homophone Animals", "items": ["Blue whale", "white tailed deer", "snowshoe hare", "przewalski's horse"]}], [{"group": 1, "name": "Nocturnal Marsupials", "items": ["Sugar glider", "possum", "quoll", "koala"]}, {"group": 2, "name": "Easter Animals", "items": ["Rabbit", "bilby", "chicken", "lamb"]}, {"group": 3, "name": "Animals w/ Fruit Names", "items": ["Lemon shark", "banana slug", "coconut crab", "kiwi"]}, {"group": 4, "name": "Egg Layers", "items": ["Corn snake", "osprey", "platypus", "trout"]}], [{"group": 1, "name": "Birds w/ Long Legs, Necks & Bills", "items": ["Blue heron", "white stork", "gray crested crane", "snowy egret"]}, {"group": 2, "name": "True Crabs", "items": ["Chesapeake blue crab", "snow crab", "dungeness crab", "spider crab"]}, {"group": 3, "name": "Giraffidae Members", "items": ["Reticulated giraffe", "okapi", "northern giraffe", "southern giraffe"]}, {"group": 4, "name": "Animals w/ Hyphenated Names", "items": ["Gray-go-away-bird", "fer-de-lance snake", "blue-crowned parakeet", "cotton-top tamarin"]}], [{"group": 1, "name": "\"Greater\" Animals", "items": ["Greater grison", "greater flamingo", "greater kudu", "greater bilby"]}, {"group": 2, "name": "Smelly Defenders", "items": ["Zorrilla", "woodhoopoes", "bombardier beetle", "eastern spotted skunk"]}, {"group": 3, "name": "Animals w/ Carapace", "items": ["Box turtle", "sulcata tortoise", "snow crab", "ghost shrimp"]}, {"group": 4, "name": "Animals w/ Accented Names", "items": ["Vicuna", "adelie penguin", "Galapagos giant tortoise", "nandu"]}], [{"group": 1, "name": "Fishers", "items": ["Fisher", "belted kingfisher", "oriental dwarf kingfisher", "ringer kingfisher"]}, {"group": 2, "name": "Animals w/ \"Spring\" Names", "items": ["Springtail", "klipspringer", "springbok", "springer spaniel"]}, {"group": 3, "name": "Animals That Laugh", "items": ["Laughing kookaburra", "spotted hyena", "striped hyena", "human"]}, {"group": 4, "name": "Animals That Facilitated Trade", "items": ["Dromedary camel", "water buffalo", "horse", "mule"]}], [{"group": 1, "name": "Ghost Animals", "items": ["Ghost shrimp", "Australian ghost shark", "lesser ghost bat", "ghost crab"]}, {"group": 2, "name": "Catfishers", "items": ["Electric eel", "blue catfish", "channel catfish", "flathead catfish"]}, {"group": 3, "name": "Animals That Collect Rocks", "items": ["Adelie penguin", "gentoo penguin", "sea otter", "river otter"]}, {"group": 4, "name": "Venomous Fish", "items": ["Lionfish", "stonefish", "moray eel", "scorpion fish"]}], [{"group": 1, "name": "Sparrows", "items": ["Song sparrow", "house sparrow", "Eurasian tree sparrow", "rock sparrow"]}, {"group": 2, "name": "Camelids", "items": ["Dromedary camel", "vicuna", "alpaca", "llama"]}, {"group": 3, "name": "Ocellated Animals", "items": ["Ocellated turkey", "Indian peacock", "green peacock", "squinting brown bush butterfly"]}, {"group": 4, "name": "Not Sexually Dimorphic", "items": ["Cotton-tuft tamarin", "xeme", "senegal parrot", "aardwolf"]}], [{"group": 1, "name": "Asian ___", "items": ["Asian elephant", "Asian black bear", "Asian barred owlet", "Asian palm civet"]}, {"group": 2, "name": "Vertically Striped Fish", "items": ["Lionfish", "angelfish", "striped killifish", "night sergeant"]}, {"group": 3, "name": "Dust Bathers", "items": ["Chinchilla", "European bison", "American bison", "African elephant"]}, {"group": 4, "name": "Non-Nose Sniffers", "items": ["Bearded dragon", "monarch butterfly", "coconut octopus", "garter snake"]}], [{"group": 1, "name": "Southern ___", "items": ["Southern hognose snake", "southern pacific rattlesnake", "southern blueberry bee", "southern pudu"]}, {"group": 2, "name": "Sea Turtles", "items": ["Leatherback sea turtle", "loggerhead sea turtle", "green sea turtle", "hawksbill sea turtle"]}, {"group": 3, "name": "Animals w/ More Than 2 Eyes", "items": ["Jumping spider", "tuatara", "common sea star", "bay scallop"]}, {"group": 4, "name": "Animals w/ Tufted Tails", "items": ["Reticulated giraffe", "Asiatic lion", "long-eared jerboa", "highland cow"]}], [{"group": 1, "name": "Civets", "items": ["African civet", "otter civet", "malagasy civet", "Asian palm civet"]}, {"group": 2, "name": "House ___", "items": ["Housefly", "house sparrow", "house finch", "house wren"]}, {"group": 3, "name": "Tenrecs", "items": ["Lowland streaked tenrec", "tailless tenrec", "greater hedgehog tenrec", "Malagasy otter shrew"]}, {"group": 4, "name": "Tethytheria Descendants", "items": ["Rock hyrax", "tree hyrax", "borneo elephant", "African bush elephant"]}], [{"group": 1, "name": "Owls", "items": ["Barn owl", "snowy owl", "barred owl", "little owl"]}, {"group": 2, "name": "Animals That Rhyme w/ \"Perilla\"", "items": ["Mountain gorilla", "Western gorilla", "Eastern gorilla", "chinchilla"]}, {"group": 3, "name": "Animals Endemic to Australia", "items": ["Common ringtail possum", "galah", "Antilopine kangaroo", "common wallaroo"]}, {"group": 4, "name": "\"Collectors\"", "items": ["Cichlid", "red squirrel", "blue jay", "chipmunk"]}], [{"group": 1, "name": "Pinniped Animals", "items": ["Harbor seal", "pacific walrus", "California sea lion", "Japanese sea lion"]}, {"group": 2, "name": "Zebra ___", "items": ["Zebra mussel", "zebrafish", "Australian zebra finch", "zebra shark"]}, {"group": 3, "name": "Animals w/ Honey Diet", "items": ["Honey bee", "honey badger", "white-eared honeyeater", "yellow-faced honeyeater"]}, {"group": 4, "name": "Bipedal Mammals", "items": ["Human", "red kangaroo", "kangaroo rat", "pangolin"]}], [{"group": 1, "name": "Warblers", "items": ["Kentucky warbler", "leaf warbler", "willow warbler", "sedge warbler"]}, {"group": 2, "name": "Canids", "items": ["Coyote", "gray wolf", "common raccoon dog", "African painted dog"]}, {"group": 3, "name": "Seasonal Colorchangers", "items": ["Snowshoe hare", "rock ptarmigan", "ermine", "arctic fox"]}, {"group": 4, "name": "Animals w/ \"Head Accessories\"", "items": ["Axolotl", "asiatic lion", "frilled-neck lizard", "sulfur crested cockatoo"]}], [{"group": 1, "name": "Ocean Mammals", "items": ["Orca", "whale", "sea otter", "vaquita"]}, {"group": 2, "name": "Animals That \"Piggyback\" on Other Species", "items": ["Remora fish", "oxpecker", "tick", "spiny lobster"]}, {"group": 3, "name": "\"Bald\" Birds", "items": ["Black vulture", "turkey vulture", "bald eagle", "white backed vulture"]}, {"group": 4, "name": "River Animals", "items": ["River otter", "beaver", "pink river dolphin", "American alligator"]}], [{"group": 1, "name": "Eared Seals/ Sea Lions", "items": ["California sea lion", "Japanese sea lion", "Galapagos sea lion", "Australian sea lion"]}, {"group": 2, "name": "Earless/ True Seals", "items": ["Harbor seal", "elephant seal", "Hawaiian monk seal", "leopard seal"]}, {"group": 3, "name": "Strongest Electrorecepters", "items": ["Hammerhead shark", "bull shark", "chimera fish", "eagle ray"]}, {"group": 4, "name": "Whiskerless Mammals", "items": ["Human", "duck-billed platypus", "short-beaked echidna", "long-beaked echidna"]}], [{"group": 1, "name": "Cobras", "items": ["King cobra", "cape cobra", "goldie's tree cobra", "Mozambique spitting cobra"]}, {"group": 2, "name": "Saw Animals", "items": ["Saw-scaled viper", "knifetooth sawfish", "small tooth sawfish", "largetooth sawfish"]}, {"group": 3, "name": "Blue Spotted Animals", "items": ["Indian peacock", "greater blue-ringed octopus", "southern blue-ringed octopus", "blue spotted stingray"]}, {"group": 4, "name": "Snakes That Use Rectilinear Locomotion", "items": ["Gaboon viper", "boa constrictor", "ball python", "reticulated python"]}], [{"group": 1, "name": "\"False\" Animals", "items": ["False chameleon", "false water cobra", "false killer whale", "false widow spider"]}, {"group": 2, "name": "Carpet ___", "items": ["Carpet viper", "carpet chameleon", "carpet beetle", "wobbegong"]}, {"group": 3, "name": "Extremophiles", "items": ["Yeti crab", "giant tube worm", "antarctic krill", "tardigrade"]}, {"group": 4, "name": "Animals w/ Movement in Their Name", "items": ["Fruit fly", "greater roadrunner", "lesser roadrunner", "walking catfish"]}], [{"group": 1, "name": "Darwin's ___", "items": ["Darwin's finch", "Darwin's fox", "Darwin's frog", "Darwin's rhea"]}, {"group": 2, "name": "Chameleons", "items": ["Panther chameleon", "veiled chameleon", "common chameleon", "carpet chameleon"]}, {"group": 3, "name": "Animals w/ Flavorful Names", "items": ["Yellow tang", "blue tang", "saltwater crocodile", "cinnamon bear"]}, {"group": 4, "name": "Animals w/ Profession Names", "items": ["Nurse shark", "cleaner wrasse", "surgeonfish", "German shepherd dog"]}], [{"group": 1, "name": "Diamondback ___", "items": ["Diamondback moth", "Eastern diamondback rattlesnake", "red diamondback rattlesnake", "Western diamondback rattlesnake"]}, {"group": 2, "name": "Box ___", "items": ["Ornate box turtle", "box jellyfish", "yellow boxfish", "Florida box turtle"]}, {"group": 3, "name": "Monogamous Birds", "items": ["Mississippi kite", "macaroni penguin", "bald eagle", "swan"]}, {"group": 4, "name": "Feathered Amphibians", "items": ["Axolotl", "common mudpuppy", "dwarf waterdog", "olm"]}], [{"group": 1, "name": "\"Tigers\"", "items": ["Eastern tiger snake", "goliath tigerfish", "tiger salamander", "sand tiger shark"]}, {"group": 2, "name": "Herding Dogs", "items": ["Blue heeler", "border collie", "Australian shepherd", "Australian cattle dog"]}, {"group": 3, "name": "Animals That Carry Their Homes", "items": ["Indian star tortoise", "leatherback sea turtle", "garden snail", "hermit crab"]}, {"group": 4, "name": "Cingulata Members", "items": ["Nine-banded armadillo", "Linnaeus's two-toed sloth", "brown-throated sloth", "giant anteater"]}], [{"group": 1, "name": "Shepherds", "items": ["Australian shepherd dog", "german shepherd dog", "belgian shepherd", "dutch shepherd"]}, {"group": 2, "name": "A-merry-can Animals", "items": ["American alligator", "american toad", "american eel", "american robin"]}, {"group": 3, "name": "Birds From The \"12 Days of Christmas\"", "items": ["European turtle dove", "gray partridge", "faverolles chicken", "swan goose"]}, {"group": 4, "name": "Animals that STOCK up For Winter", "items": ["Gray squirrel", "African wild cat", "star-nosed mole", "red fox"]}], [{"group": 1, "name": "Vipers", "items": ["Western bush viper", "rhino viper", "puff adder", "eyelash viper"]}, {"group": 2, "name": "Reproducers via Fragmentation", "items": ["Hammerhead worm", "venus glass sponge", "common sea star", "basket star"]}, {"group": 3, "name": "Iridescent Birds", "items": ["Common grackle", "boat-tailed grackle", "common starling", "spotless starling"]}, {"group": 4, "name": "Animals w/ Instrument Names", "items": ["Harp seal", "rock bass", "horn shark", "red drum fish"]}], [{"group": 1, "name": "Eastern ___", "items": ["Eastern cottontail", "eastern chipmunk", "eastern bluebird", "eastern gorilla"]}, {"group": 2, "name": "Larks", "items": ["Eurasian skylark", "crested lark", "calandra lark", "desert lark"]}, {"group": 3, "name": "Alcidae Members", "items": ["Tufted puffin", "least auklet", "ancient murrelets", "common murre"]}, {"group": 4, "name": "Unblinkable Animals", "items": ["Day gecko", "leopard gecko", "cape cobra", "goldfish"]}], [{"group": 1, "name": "African ___", "items": ["African painted dog", "African bush elephant", "African civet", "African jacana"]}, {"group": 2, "name": "Lynxes", "items": ["Bobcat", "Canada lynx", "Eurasian lynx", "Iberian lynx"]}, {"group": 3, "name": "Scaled Mammals", "items": ["Ground pangolin", "Chinese pangolin", "giant armadillo", "nine-banded armadillo"]}, {"group": 4, "name": "Seasonal Color Changing Birds", "items": ["Snow bunting", "American goldfinch", "rock ptarmigan", "tufted puffin"]}], [{"group": 1, "name": "Amur ___", "items": ["Amur falcon", "amur leopard", "amur tiger", "amur hedgehog"]}, {"group": 2, "name": "Body Part Animals", "items": ["Colon rectum", "lungfish", "dik-dik", "apple head chihuahua"]}, {"group": 3, "name": "Chronic Wasting Disease Infectants", "items": ["White tailed deer", "moose", "mule deer", "Rocky Mountain elk"]}, {"group": 4, "name": "Animals w/ Emotional Names", "items": ["Central European boar", "Lillian's lovebird", "pleasing fungus beetle", "Hawaiian happyface spider"]}], [{"group": 1, "name": "Vultures", "items": ["Griffon vulture", "black vulture", "turkey vulture", "king vulture"]}, {"group": 2, "name": "Rock ___", "items": ["Rock bass", "rock crab", "rock python", "rock hyrax"]}, {"group": 3, "name": "Quadrupeds w/ Stronger Hind Legs", "items": ["Snowshoe hare", "caracal", "green frog", "rock-wallaby"]}, {"group": 4, "name": "Animals w/ Combs", "items": ["Chicken", "comb-crested jacana", "comb jellyfish", "aye-aye"]}], [{"group": 1, "name": "Pine ___", "items": ["Pine beetle", "pine snake", "pine marten", "pine siskin"]}, {"group": 2, "name": "Goats", "items": ["Iberian ibex", "markhor", "alpine goat", "domesticated goat"]}, {"group": 3, "name": "Hooded Animals", "items": ["Hooded oriole", "hooded seal", "hooded skunk", "king cobra"]}, {"group": 4, "name": "Percussion Animals", "items": ["Mountain bongo", "dugong", "red drum fish", "freshwater drum"]}], [{"group": 1, "name": "Desert ___", "items": ["Desert rain frog", "desert locust", "desert wolf", "desert kingsnake"]}, {"group": 2, "name": "Animals That Look Like Poop", "items": ["South American bird poop frog", "giant swallowtail butterflies", "bird dropping spider", "crab spider"]}, {"group": 3, "name": "Animals w/ Rectangular Pupils", "items": ["Oak toad", "sheep", "walia ibex", "giant pacific octopus"]}, {"group": 4, "name": "Animals w/ Bills", "items": ["Duck-billed platypus", "mallard duck", "shoebill stork", "canada goose"]}], [{"group": 1, "name": "Wallabies", "items": ["Red-necked wallaby", "rock-wallaby", "parma wallaby", "brush-tailed rock-wallaby"]}, {"group": 2, "name": "\"Dragons\"", "items": ["Butterfly dragonfly", "dragonfish", "bearded dragon", "Chinese water dragon"]}, {"group": 3, "name": "Animals Named After People", "items": ["Anna's hummingbird", "Swainson's hawk", "Steller's jay", "Cooper's hawk"]}, {"group": 4, "name": "Animals w/ Government-Related Names", "items": ["Monarch butterfly", "queensnake", "Scale-Crested Pygmy Tyrant", "scarlet kingsnake"]}], [{"group": 1, "name": "Ornate Animals", "items": ["Ornate hawk eagle", "ornate box turtle", "ornate monitor lizard", "ornate bichir"]}, {"group": 2, "name": "___ Eater", "items": ["Giant anteater", "singing honeyeater", "Asian green bee-eater", "crabeater seal"]}, {"group": 3, "name": "Vocal Mimickers", "items": ["Northern mockingbird", "black drongo", "African gray parrot", "American crow"]}, {"group": 4, "name": "Animals w/ Sewing-Related Names", "items": ["Keeltail needlefish", "pinfish", "buttonquail", "village weaver"]}], [{"group": 1, "name": "Nile Inhabitants", "items": ["Nile crocodile", "nile tilapia", "nile monitor", "nile perch"]}, {"group": 2, "name": "Shrimps", "items": ["Spot shrimp", "white shrimp", "blue shrimp", "banana shrimp"]}, {"group": 3, "name": "Scaleless Fish", "items": ["Hardhead snailfish", "black sea snail", "Australian ghost shark", "moray eel"]}, {"group": 4, "name": "Animals w/ Black Facial Markings", "items": ["Giant panda", "black footed ferret", "raccoon", "cheetah"]}], [{"group": 1, "name": "Tortoises", "items": ["African spurred tortoise", "hermann's tortoise", "galapagos giant tortoise", "leopard tortoise"]}, {"group": 2, "name": "Animals w/ Leaf Names", "items": ["Leaf sea slug", "leafcutter ant", "leaf warbler", "leaf-tailed gecko"]}, {"group": 3, "name": "Animals w/ Onomatopoeia Names", "items": ["Snapping shrimp", "boomslang", "howler monkey", "bark beetle"]}, {"group": 4, "name": "Lantern-related Animals", "items": ["Border collie dog", "spotted lanternfly", "anglerfish", "peanut-headed lanternfly"]}], [{"group": 1, "name": "Dalmatians", "items": ["Dalmatian dog", "dalmatian pelican", "dalmatian springtail", "Dalmatian wall lizard"]}, {"group": 2, "name": "Ducks", "items": ["American black duck", "American coot", "Mallard", "wood duck"]}, {"group": 3, "name": "Spawners", "items": ["Sockeye salmon", "Chesapeake blue crab", "royal cucumber", "rock oyster"]}, {"group": 4, "name": "Cereal Mascots", "items": ["Toco toucan", "tufted puffin", "bumblebee", "bengal tiger"]}], [{"group": 1, "name": "Quails", "items": ["Common quail", "scaled quail", "blue quail", "king quail"]}, {"group": 2, "name": "Geese", "items": ["Brant", "Canada goose", "snow goose", "ross' goose"]}, {"group": 3, "name": "Oceanic Echolocators", "items": ["Orca", "bottlenose dolphin", "humpback whale", "blue whale"]}, {"group": 4, "name": "Astronaut Animals", "items": ["Rhesus monkey", "Philippine monkey", "squirrel monkey", "domesticated dog"]}], [{"group": 1, "name": "Amur ___", "items": ["Amur falcon", "amur leopard", "amur tiger", "amur hedgehog"]}, {"group": 2, "name": "Body Part Animals", "items": ["Colon rectum", "lungfish", "dik-dik", "barreleye fish"]}, {"group": 3, "name": "Chronic Wasting Disease Infectants", "items": ["White tailed deer", "moose", "mule deer", "Rocky Mountain elk"]}, {"group": 4, "name": "Animals w/ Emotional Names", "items": ["Central European boar", "Lillian's lovebird", "pleasing fungus beetle", "Hawaiian happyface spider"]}], [{"group": 1, "name": "Barn ___", "items": ["Barn owl", "barn swallow", "barn spider", "barnacle"]}, {"group": 2, "name": "Large Parrots", "items": ["Kea", "galah cockatoo", "scarlet macaw", "hawk headed parrot"]}, {"group": 3, "name": "Animals that Defend Themselves w/ Sprays", "items": ["Snow petrel", "Texas horned lizard", "Bombardier beetle", "sea cucumber"]}, {"group": 4, "name": "Birds that Make Sacrifices for Their Young", "items": ["Emperor penguin", "macaroni penguin", "brown pelican", "Dalmatian pelican"]}], [{"group": 1, "name": "Lovely Animals", "items": ["Lovely poison frog", "rosy faced lovebird", "Lillian's lovebird", "Fischer's lovebird"]}, {"group": 2, "name": "Sun Animals", "items": ["Ocean sunfish", "sunflower starfish", "angle sunbeam", "sun bear"]}, {"group": 3, "name": "Animals that Kiss", "items": ["Rhodnius prolixus", "Triatoma infestans", "Triatoma dimidiata", "kissing fish"]}, {"group": 4, "name": "Animals that Inspired Iconic Pokemon", "items": ["Pika", "platypus", "large rock rat", "Indian rhinoceros"]}], [{"group": 1, "name": "Ground ___", "items": ["Groundhog", "ground snake", "groundhog tick", "mohave ground squirrel"]}, {"group": 2, "name": "Sea ___", "items": ["Green sea turtle", "leafy seadragon", "dwarf seahorse", "black-banded sea krait"]}, {"group": 3, "name": "Mouthbrooders", "items": ["Kissing fish", "dwarf gourami", "Asian gourami", "yellowhead jawfish"]}, {"group": 4, "name": "Fake Bears", "items": ["Koala", "tardigrade", "bear cat", "red panda"]}], [{"group": 1, "name": "Gars", "items": ["Alligator gar", "longnose gar", "spotted gar", "florida gar"]}, {"group": 2, "name": "Falcons", "items": ["Peregrine falcon", "common kestrel", "amur falcon", "merlin"]}, {"group": 3, "name": "Fish that Fish", "items": ["Red-lipped batfish", "polka-dot batfish", "redeye gaper", "frogfish"]}, {"group": 4, "name": "Animals that Live in Colonies", "items": ["Carpenter ant", "vampire bat", "Eurasian beaver", "brown rat"]}], [{"group": 1, "name": "Angels", "items": ["Freshwater angel", "angel shark", "Emperor angelfish", "masked angelfish"]}, {"group": 2, "name": "Scrub ___", "items": ["Scrub python", "scrub hare", "island scrub jay", "rufous scrubbird"]}, {"group": 3, "name": "Ruminants", "items": ["Cow", "goat", "water buffalo", "southern giraffe"]}, {"group": 4, "name": "Flexible Land Animals", "items": ["Black footed ferret", "hero shrew", "earth worm", "domesticated cat"]}], [{"group": 1, "name": "Common ___", "items": ["Common carp", "common frog", "common grackle", "common toad"]}, {"group": 2, "name": "Red-Eyed Animals", "items": ["Red-eyed vireo", "red-eyed tree frog", "red-eyed crocodile skink", "redeye tetra"]}, {"group": 3, "name": "Animals w/ Contradicting Names", "items": ["Bear cat", "raccoon dog", "kangaroo rat", "skunk bear"]}, {"group": 4, "name": "Animals w/ Family-Related Names", "items": ["Great pyrenees", "European bison", "aoudad sheep", "carpenter ant"]}], [{"group": 1, "name": "Sloths", "items": ["Linnaeus's two-toed sloth", "Hoffmann's two-toed sloth", "brown-throated sloth", "maned sloth"]}, {"group": 2, "name": "Serows", "items": ["Taiwan serow", "Japanese serow", "Sumatran serow", "mainland serow"]}, {"group": 3, "name": "Phasianidae Members", "items": ["Golden pheasant", "blood pheasant", "Indian peafowl", "congo peafowl"]}, {"group": 4, "name": "Animals w/ Human-Like Names", "items": ["Purple marten", "cavalier king charles spaniel", "john dory", "common molly"]}], [{"group": 1, "name": "Pacific ___", "items": ["Pacific spaghetti eel", "pacific coast tick", "pacific sleeper shark", "pacific walrus"]}, {"group": 2, "name": "Animals that Shriek", "items": ["Northern screamer", "screaming hairy armadillo", "horned screamer", "screech owl"]}, {"group": 3, "name": "Cobra-Like Snakes", "items": ["False water cobra", "eastern hognose snake", "rinkhal", "western hognose snake"]}, {"group": 4, "name": "Animals w/ Violent Names", "items": ["Stabyhoun dog", "black pearl's killifish", "knifefish", "killer bee"]}], [{"group": 1, "name": "Blood ___", "items": ["Bloodhound dog", "blood python", "blood pheasant", "box-headed blood bee"]}, {"group": 2, "name": "Loons", "items": ["Common loon", "black-throated loon", "pacific loon", "yellow-billed loon"]}, {"group": 3, "name": "Animals w/ Religious Names", "items": ["Catholic frog", "kermode bear", "saint bernard dog", "angelshark"]}, {"group": 4, "name": "Malagasy Carnivores", "items": ["Fossa", "Grandidier's mongoose", "malagasy civet", "Durrell's vontsira"]}], [{"group": 1, "name": "Arctic ___", "items": ["Arctic hare", "arctic wolf", "arctic fox", "arctic char"]}, {"group": 2, "name": "Frogs", "items": ["Darwin's frog", "burrowing frog", "common frog", "edible frog"]}, {"group": 3, "name": "Animals w/ Tool Names", "items": ["Yellowhammer", "sawfish", "drill", "saw-scaled viper"]}, {"group": 4, "name": "Most Endangered Species", "items": ["Javan rhino", "amur leopard", "sunda island tiger", "tapanuli orangutan"]}], [{"group": 1, "name": "Pigeons", "items": ["Rock pigeon", "hill pigeon", "snow pigeon", "speckled pigeon"]}, {"group": 2, "name": "Salamanders", "items": ["Fire salamander", "giant salamander", "tiger salamander", "axolotl"]}, {"group": 3, "name": "Animals that can Eviscerate", "items": ["Royal cucumber", "Australian sea apple", "pineapple sea cucumber", "headless chicken monster"]}, {"group": 4, "name": "Reptiles that Parent", "items": ["Monkey-tailed skink", "saltwater crocodile", "chinese alligator", "gharial"]}], [{"group": 1, "name": "Fake Cats", "items": ["Blue catfish", "bear cat", "armored catfish", "gray catbird"]}, {"group": 2, "name": "String Instrument Animals", "items": ["Banjo catfish", "striped bass", "fiddler crab", "harp seal"]}, {"group": 3, "name": "Animals w/ Frog Feet", "items": ["Horse", "donkey", "American bullfrog", "green toad"]}, {"group": 4, "name": "Animals w/ \"People\" Names", "items": ["Fallow deer", "persian cat", "birman cat", "norfolk terrier"]}]];const CONN_IDS=["06-24-001", "06-25-002", "06-26-003", "06-27-004", "06-28-005", "06-29-006", "06-30-007", "07-01-008", "07-02-009", "07-03-010", "07-04-011", "07-05-012", "07-06-013", "07-07-014", "07-08-015", "07-09-016", "07-10-017", "07-11-018", "07-12-019", "07-13-020", "07-14-021", "07-15-022", "07-16-023", "07-17-024", "07-18-025", "07-19-026", "07-20-030", "07-21-031", "07-22-032", "07-23-033", "07-24-034", "07-25-035", "07-26-036", "07-27-037", "07-28-038", "07-29-039", "07-30-040", "07-31-041", "08-01-042", "08-02-043", "08-03-044", "08-04-045", "08-05-046", "08-06-047", "08-13-048", "08-20-049", "08-27-050", "09-03-051", "09-10-052", "09-17-053", "09-24-054", "10-01-055", "10-08-056", "10-15-057", "10-22-058", "10-29-059", "11-05-060", "11-12-061", "11-19-062", "11-26-063", "12-03-064", "12-10-065", "12-17-066", "12-24-067", "12-31-068", "01-07-069", "01-14-070", "01-21-071", "01-28-072", "02-04-073", "02-11-074", "02-18-075", "02-25-076", "03-03-077", "03-10-078", "03-17-079", "03-24-080", "03-31-081", "04-07-082", "04-14-083", "04-21-084", "04-28-085", "05-05-086", "05-12-087", "05-19-088", "05-26-089", "06-02-090", "06-09-091", "06-16-092", "06-23-093", "06-30-094", "07-07-095", "07-14-096", "07-21-097", "07-28-098", "08-04-099", "08-11-100", "08-18-101", "08-25-102", "09-01-103", "09-08-104", "09-15-105", "09-22-106", "09-29-107", "10-06-108", "10-13-109", "10-20-110", "10-27-111", "11-03-112", "11-10-113", "11-17-114", "11-24-115", "12-01-116", "12-08-117", "12-15-118", "12-22-119", "12-29-120", "01-05-121", "01-12-122", "01-19-123", "01-26-124", "02-02-125", "02-09-126", "02-16-127", "02-23-128", "03-02-129", "03-09-130", "03-16-131", "03-23-131", "03-30-132", "04-06-133", "04-13-134", "04-20-135", "04-27-136", "05-04-137", "05-11-138", "05-18-139", "05-25-140", "06-01-141", "06-08-142", "06-15-143", "06-22-144"];
+// ═══════════════════════════════════════════════
+//  THEME & NAV
+// ═══════════════════════════════════════════════
+let darkMode = localStorage.getItem('theme') === 'dark';
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+  document.querySelector('.theme-toggle').textContent = darkMode ? '☀️' : '🌙';
+  localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+}
+function toggleTheme() { darkMode = !darkMode; applyTheme(); }
+applyTheme();
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ═══════════════════════════════════════════════
+//  CONNECTIONS GAME
+// ═══════════════════════════════════════════════
+let connState = {
+  puzzle: null,
+  puzzleIdx: -1,
+  tiles: [],       // [{item, group, solved}]
+  selected: new Set(),
+  attempts: 4,
+  solvedGroups: [],
+  gameOver: false,
+};
+
+function newConnGame() {
+  const idx = Math.floor(Math.random() * CONN_DATA.length);
+  connState = {
+    puzzle: CONN_DATA[idx],
+    puzzleIdx: idx,
+    tiles: [],
+    selected: new Set(),
+    attempts: 4,
+    solvedGroups: [],
+    gameOver: false,
+  };
+  // Build flat tile list
+  for (const group of CONN_DATA[idx]) {
+    for (const item of group.items) {
+      if (item.trim()) {
+        connState.tiles.push({ item: item.trim(), group: group.group, solved: false });
+      }
+    }
+  }
+  shuffle(connState.tiles);
+  // Update puzzle ID label
+  const id = CONN_IDS[idx];
+  document.getElementById('conn-puzzle-id').textContent = 'Puzzle ' + id;
+  document.getElementById('conn-banners').innerHTML = '';
+  // Reset dots
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('dot-' + i).classList.remove('used');
+  }
+  setConnStatus('');
+  document.getElementById('conn-submit-btn').disabled = false;
+  renderConnGrid();
+}
+
+function renderConnGrid() {
+  const grid = document.getElementById('conn-grid');
+  const bannersEl = document.getElementById('conn-banners');
+  grid.innerHTML = '';
+
+  // Only add newly solved banners (ones not already in DOM)
+  const existingBannerGroups = new Set(
+    [...bannersEl.querySelectorAll('.conn-solved-row')].map(el => el.dataset.group)
+  );
+  for (const sg of connState.solvedGroups) {
+    if (!existingBannerGroups.has(String(sg.group))) {
+      const banner = document.createElement('div');
+      banner.className = 'conn-solved-row';
+      banner.dataset.group = sg.group;
+      banner.innerHTML = `<div class="row-name">${escHtml(sg.name)}</div><div class="row-items">${sg.items.map(i => escHtml(i.toUpperCase())).join(' · ')}</div>`;
+      bannersEl.appendChild(banner);
+    }
+  }
+
+  // Remaining tiles
+  const remaining = connState.tiles.filter(t => !t.solved);
+  for (let i = 0; i < remaining.length; i++) {
+    const t = remaining[i];
+    const tile = document.createElement('div');
+    tile.className = 'conn-tile';
+    if (connState.selected.has(i)) tile.classList.add('selected');
+    tile.textContent = t.item.toUpperCase();
+    if (!connState.gameOver) {
+      tile.addEventListener('click', () => connToggle(i));
+    }
+    grid.appendChild(tile);
+  }
+}
+
+function connToggle(idx) {
+  if (connState.gameOver) return;
+  if (connState.selected.has(idx)) {
+    connState.selected.delete(idx);
+  } else {
+    if (connState.selected.size >= 4) return;
+    connState.selected.add(idx);
+  }
+  renderConnGrid();
+}
+
+function connDeselect() {
+  connState.selected.clear();
+  renderConnGrid();
+}
+
+function connShuffle() {
+  const remaining = connState.tiles.filter(t => !t.solved);
+  shuffle(remaining);
+  // Rebuild tiles array: solved first (order preserved), then shuffled remaining
+  const solved = connState.tiles.filter(t => t.solved);
+  connState.tiles = [...solved, ...remaining];
+  connState.selected.clear();
+  renderConnGrid();
+}
+
+function connSubmit() {
+  if (connState.gameOver) return;
+  if (connState.selected.size !== 4) {
+    setConnStatus('Select exactly 4 tiles.');
+    return;
+  }
+  const remaining = connState.tiles.filter(t => !t.solved);
+  const selectedTiles = [...connState.selected].map(i => remaining[i]);
+  const groups = selectedTiles.map(t => t.group);
+  const allSame = groups.every(g => g === groups[0]);
+
+  if (allSame) {
+    // Correct!
+    const groupNum = groups[0];
+    const groupData = connState.puzzle.find(g => g.group === groupNum);
+    for (const t of selectedTiles) t.solved = true;
+    connState.solvedGroups.push({ group: groupNum, name: groupData.name, items: selectedTiles.map(t => t.item) });
+    connState.selected.clear();
+    setConnStatus('✓ Correct!');
+    renderConnGrid();
+
+    if (connState.solvedGroups.length === 4) {
+      connState.gameOver = true;
+      setTimeout(() => setConnStatus('🎉 Puzzle complete! Amazing!'), 400);
+      document.getElementById('conn-submit-btn').disabled = true;
+    }
+  } else {
+    // Wrong
+    connState.attempts--;
+    const dotIdx = 4 - connState.attempts - 1;
+    document.getElementById('dot-' + dotIdx).classList.add('used');
+
+    // Check if one away
+    const maxSame = Math.max(...Object.values(groups.reduce((acc, g) => { acc[g] = (acc[g]||0)+1; return acc; }, {})));
+    const msg = maxSame === 3 ? 'One away…' : 'Not quite!';
+    setConnStatus(msg);
+
+    // Shake tiles
+    const tiles = document.querySelectorAll('.conn-tile.selected');
+    tiles.forEach(t => { t.classList.add('shake'); setTimeout(() => t.classList.remove('shake'), 600); });
+
+    connState.selected.clear();
+
+    if (connState.attempts <= 0) {
+      connState.gameOver = true;
+      setTimeout(() => revealAllConn(), 800);
+    }
+  }
+}
+
+function revealAllConn() {
+  const unsolved = connState.tiles.filter(t => !t.solved);
+  const byGroup = {};
+  for (const t of unsolved) {
+    if (!byGroup[t.group]) byGroup[t.group] = [];
+    byGroup[t.group].push(t);
+  }
+  for (const [g, tiles] of Object.entries(byGroup)) {
+    const groupData = connState.puzzle.find(gr => gr.group === parseInt(g));
+    for (const t of tiles) t.solved = true;
+    connState.solvedGroups.push({ group: parseInt(g), name: groupData.name, items: tiles.map(t => t.item) });
+  }
+  connState.solvedGroups.sort((a,b) => a.group - b.group);
+  setConnStatus('Game over — better luck next time!');
+  document.getElementById('conn-submit-btn').disabled = true;
+  renderConnGrid();
+}
+
+function setConnStatus(msg) {
+  document.getElementById('conn-status').textContent = msg;
+}
+
+// ═══════════════════════════════════════════════
+//  CROSSWORD GAME
+// ═══════════════════════════════════════════════
+let cwState = {
+  words: [],       // [{hint, answer, dir, row, col, num}]
+  grid: [],        // 2D array of cells
+  rows: 0, cols: 0,
+  activeWord: null, // word index
+  activeDir: 'across',
+  activeCellR: -1,
+  activeCellC: -1,
+  autocheck: false,
+};
+
+function toggleAutocheck() {
+  cwState.autocheck = !cwState.autocheck;
+  const label = document.getElementById('autocheck-label');
+  label.classList.toggle('on', cwState.autocheck);
+  recheckAll();
+}
+
+function newCWGame() {
+  const placed = generateCrossword(CW_DATA, 10);
+  if (!placed) { newCWGame(); return; }
+  cwState.words = placed.words;
+  cwState.grid = placed.grid;
+  cwState.rows = placed.rows;
+  cwState.cols = placed.cols;
+  cwState.activeWord = null;
+  cwState.activeDir = 'across';
+  cwState.activeCellR = -1;
+  cwState.activeCellC = -1;
+  document.getElementById('cw-complete').style.display = 'none';
+  renderCW();
+}
+
+// ── Crossword generation ──
+function generateCrossword(pool, targetCount) {
+  // Filter to single-word or hyphen-only answers for grid simplicity
+  const eligible = pool.filter(w => /^[a-z\s]+$/.test(w.answer) && w.answer.length >= 3 && w.answer.length <= 14);
+  
+  // Try many random subsets to find one with good crossings
+  for (let attempt = 0; attempt < 200; attempt++) {
+    const sample = sampleN(eligible, Math.min(targetCount + 10, eligible.length));
+    const result = tryPlace(sample, targetCount);
+    if (result && result.words.length >= 8) return result;
+  }
+  return null;
+}
+
+function tryPlace(candidates, target) {
+  // Normalize answers to letters only (remove spaces for grid)
+  const words = candidates.map(c => ({
+    hint: c.hint,
+    answer: c.answer.replace(/\s/g, '').toUpperCase(),
+    display: c.answer.toUpperCase(),
+  })).filter(w => w.answer.length >= 3);
+
+  if (words.length < 4) return null;
+
+  const placed = [];
+  const EMPTY = '.';
+  let minR = 0, maxR = 0, minC = 0, maxC = 0;
+  // Grid represented as sparse map r,c -> char
+  const cellMap = {};
+  const getCell = (r, c) => cellMap[`${r},${c}`] || EMPTY;
+  const setCell = (r, c, ch) => { cellMap[`${r},${c}`] = ch; };
+
+  // Place first word across at 0,0
+  const first = words[0];
+  for (let i = 0; i < first.answer.length; i++) {
+    setCell(0, i, first.answer[i]);
+  }
+  placed.push({ ...first, dir: 'across', row: 0, col: 0 });
+  maxC = first.answer.length - 1;
+
+  for (let wi = 1; wi < words.length && placed.length < target; wi++) {
+    const w = words[wi];
+    const dir = placed.length % 2 === 1 ? 'down' : 'across';
+    const oppDir = dir === 'across' ? 'down' : 'across';
+
+    // Find intersections with placed words of opposite direction
+    let bestPlacement = null;
+    let bestScore = -1;
+
+    for (const pw of placed.filter(p => p.dir === oppDir)) {
+      for (let pi = 0; pi < pw.answer.length; pi++) {
+        const sharedChar = pw.answer[pi];
+        const matchPositions = [];
+        for (let wi2 = 0; wi2 < w.answer.length; wi2++) {
+          if (w.answer[wi2] === sharedChar) matchPositions.push(wi2);
+        }
+        for (const myIdx of matchPositions) {
+          let r, c;
+          if (dir === 'across') {
+            // pw is down: pw.row + pi is the row, pw.col is the col
+            r = pw.row + pi;
+            c = pw.col - myIdx;
+          } else {
+            // pw is across: pw.row is the row, pw.col + pi is the col
+            r = pw.row - myIdx;
+            c = pw.col + pi;
+          }
+          // Check if placement is valid
+          if (canPlace(w.answer, dir, r, c, getCell, placed)) {
+            // Score: prefer more intersections, smaller bounding box growth
+            let score = 1;
+            // Count additional overlaps
+            for (let li = 0; li < w.answer.length; li++) {
+              const lr = dir === 'across' ? r : r + li;
+              const lc = dir === 'across' ? c + li : c;
+              const existing = getCell(lr, lc);
+              if (existing !== EMPTY && existing === w.answer[li]) score += 2;
+            }
+            if (score > bestScore) {
+              bestScore = score;
+              bestPlacement = { r, c };
+            }
+          }
+        }
+      }
+    }
+
+    if (bestPlacement) {
+      const { r, c } = bestPlacement;
+      for (let li = 0; li < w.answer.length; li++) {
+        const lr = dir === 'across' ? r : r + li;
+        const lc = dir === 'across' ? c + li : c;
+        setCell(lr, lc, w.answer[li]);
+      }
+      placed.push({ ...w, dir, row: r, col: c });
+      const endR = dir === 'across' ? r : r + w.answer.length - 1;
+      const endC = dir === 'across' ? c + w.answer.length - 1 : c;
+      minR = Math.min(minR, r); maxR = Math.max(maxR, endR);
+      minC = Math.min(minC, c); maxC = Math.max(maxC, endC);
+    }
+  }
+
+  if (placed.length < 6) return null;
+
+  // Normalize to 0-based
+  const offsetR = -minR, offsetC = -minC;
+  const rows = maxR - minR + 1;
+  const cols = maxC - minC + 1;
+
+  // Build 2D grid
+  const grid = Array.from({length: rows}, () => Array(cols).fill(null));
+  for (const [key, ch] of Object.entries(cellMap)) {
+    const [r, c] = key.split(',').map(Number);
+    const gr = r + offsetR, gc = c + offsetC;
+    if (gr >= 0 && gr < rows && gc >= 0 && gc < cols) {
+      grid[gr][gc] = { char: ch, userInput: '', correct: false };
+    }
+  }
+
+  // Assign clue numbers
+  const numberedCells = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (!grid[r][c]) continue;
+      const startsAcross = c === 0 || !grid[r][c-1];
+      const acrossLen = startsAcross && grid[r][c+1] ? countRun(grid, r, c, 'across') : 0;
+      const startsDown = r === 0 || !grid[r-1][c];
+      const downLen = startsDown && grid[r+1] && grid[r+1][c] ? countRun(grid, r, c, 'down') : 0;
+      if (acrossLen >= 2 || downLen >= 2) {
+        numberedCells.push({ r, c, num: numberedCells.length + 1 });
+        grid[r][c].number = numberedCells.length;
+      }
+    }
+  }
+
+  // Map words to clue numbers
+  const finalWords = [];
+  for (const pw of placed) {
+    const r = pw.row + offsetR, c = pw.col + offsetC;
+    const nc = numberedCells.find(n => n.r === r && n.c === c);
+    if (nc) {
+      finalWords.push({ ...pw, row: r, col: c, num: nc.num });
+    }
+  }
+
+  return { words: finalWords, grid, rows, cols };
+}
+
+function canPlace(answer, dir, r, c, getCell, placed) {
+  const EMPTY = '.';
+  for (let i = 0; i < answer.length; i++) {
+    const gr = dir === 'across' ? r : r + i;
+    const gc = dir === 'across' ? c + i : c;
+    const existing = getCell(gr, gc);
+    if (existing !== EMPTY && existing !== answer[i]) return false;
+    // Check adjacency: no parallel adjacent words
+    if (dir === 'across') {
+      if (i === 0 && getCell(gr, gc - 1) !== EMPTY) return false;
+      if (i === answer.length - 1 && getCell(gr, gc + 1) !== EMPTY) return false;
+      // Perpendicular adjacency allowed only if cell is shared
+      if (existing === EMPTY) {
+        if (getCell(gr - 1, gc) !== EMPTY && !isPartOfWordAt(placed, gr - 1, gc, 'across')) return false;
+        if (getCell(gr + 1, gc) !== EMPTY && !isPartOfWordAt(placed, gr + 1, gc, 'across')) return false;
+      }
+    } else {
+      if (i === 0 && getCell(gr - 1, gc) !== EMPTY) return false;
+      if (i === answer.length - 1 && getCell(gr + 1, gc) !== EMPTY) return false;
+      if (existing === EMPTY) {
+        if (getCell(gr, gc - 1) !== EMPTY && !isPartOfWordAt(placed, gr, gc - 1, 'down')) return false;
+        if (getCell(gr, gc + 1) !== EMPTY && !isPartOfWordAt(placed, gr, gc + 1, 'down')) return false;
+      }
+    }
+  }
+  return true;
+}
+
+function isPartOfWordAt(placed, r, c, exceptDir) {
+  return placed.some(pw => {
+    if (pw.dir === exceptDir) return false;
+    if (pw.dir === 'across') return pw.row === r && c >= pw.col && c < pw.col + pw.answer.length;
+    return pw.col === c && r >= pw.row && r < pw.row + pw.answer.length;
+  });
+}
+
+function countRun(grid, r, c, dir) {
+  let count = 0;
+  let cr = r, cc = c;
+  while (cr < grid.length && cc < (grid[0]?.length || 0) && grid[cr][cc]) {
+    count++;
+    if (dir === 'across') cc++; else cr++;
+  }
+  return count;
+}
+
+// ── Render crossword ──
+function renderCW() {
+  const { grid, rows, cols, words } = cwState;
+  const gridEl = document.getElementById('cw-grid');
+  const MAX_GRID_PX = 336; // max-width 340px minus a little breathing room
+  const cellSize = Math.min(36, Math.floor((MAX_GRID_PX - (cols - 1) * 2) / cols));
+  gridEl.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
+  gridEl.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
+  gridEl.innerHTML = '';
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cell = grid[r][c];
+      const div = document.createElement('div');
+      div.className = 'cw-cell';
+      div.dataset.r = r;
+      div.dataset.c = c;
+
+      if (!cell) {
+        div.classList.add('black');
+      } else {
+        if (cell.number) {
+          const num = document.createElement('span');
+          num.className = 'cw-cell-num';
+          num.textContent = cell.number;
+          div.appendChild(num);
+        }
+        const inp = document.createElement('input');
+        inp.maxLength = 1;
+        inp.value = cell.userInput || '';
+        inp.dataset.r = r;
+        inp.dataset.c = c;
+        inp.setAttribute('autocomplete','off');
+        inp.setAttribute('spellcheck','false');
+        inp.addEventListener('mousedown', (e) => { e.preventDefault(); cwClickCell(r, c); });
+        inp.addEventListener('keydown', (e) => cwKeydown(e, r, c));
+        inp.addEventListener('input', (e) => cwInput(e, r, c));
+        div.appendChild(inp);
+        applyCellStyle(div, r, c);
+      }
+      gridEl.appendChild(div);
+    }
+  }
+  renderCWClues();
+}
+
+function applyCellStyle(div, r, c) {
+  div.classList.remove('active-word','active-cursor','correct','wrong');
+  const cell = cwState.grid[r][c];
+  if (!cell) return;
+
+  const isActiveWord = cwState.activeWord !== null && isCellInWord(r, c, cwState.words[cwState.activeWord]);
+  const isActiveCursor = r === cwState.activeCellR && c === cwState.activeCellC;
+
+  if (isActiveCursor) div.classList.add('active-cursor');
+  else if (isActiveWord) div.classList.add('active-word');
+
+  if (cwState.autocheck && cell.userInput) {
+    div.classList.toggle('correct', cell.userInput === cell.char);
+    div.classList.toggle('wrong', cell.userInput !== cell.char);
+  } else if (!cwState.autocheck) {
+    // Check full word completion
+    const wordForCell = getWordContainingCell(r, c, cwState.activeDir);
+    if (wordForCell && isWordComplete(wordForCell)) {
+      div.classList.add('correct');
+    }
+  }
+}
+
+function isCellInWord(r, c, word) {
+  if (!word) return false;
+  if (word.dir === 'across') return r === word.row && c >= word.col && c < word.col + word.answer.length;
+  return c === word.col && r >= word.row && r < word.row + word.answer.length;
+}
+
+function getWordContainingCell(r, c, preferDir) {
+  let match = null;
+  for (const w of cwState.words) {
+    if (isCellInWord(r, c, w)) {
+      if (w.dir === preferDir) return w;
+      match = w;
+    }
+  }
+  return match;
+}
+
+function isWordComplete(word) {
+  for (let i = 0; i < word.answer.length; i++) {
+    const r = word.dir === 'across' ? word.row : word.row + i;
+    const c = word.dir === 'across' ? word.col + i : word.col;
+    const cell = cwState.grid[r][c];
+    if (!cell || cell.userInput !== cell.char) return false;
+  }
+  return true;
+}
+
+function cwClickCell(r, c) {
+  // If clicking same cell, toggle direction if both words exist
+  if (r === cwState.activeCellR && c === cwState.activeCellC) {
+    const otherDir = cwState.activeDir === 'across' ? 'down' : 'across';
+    const otherWord = getWordContainingCell(r, c, otherDir);
+    if (otherWord) cwState.activeDir = otherDir;
+  } else {
+    cwState.activeCellR = r;
+    cwState.activeCellC = c;
+    // Prefer same direction, else switch
+    const sameDir = getWordContainingCell(r, c, cwState.activeDir);
+    if (!sameDir) {
+      const otherDir = cwState.activeDir === 'across' ? 'down' : 'across';
+      const otherWord = getWordContainingCell(r, c, otherDir);
+      if (otherWord) cwState.activeDir = otherDir;
+    }
+  }
+
+  const word = getWordContainingCell(r, c, cwState.activeDir);
+  cwState.activeWord = word ? cwState.words.indexOf(word) : null;
+
+  // Focus the input
+  const gridEl = document.getElementById('cw-grid');
+  const cell = gridEl.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+  if (cell) cell.focus();
+
+  refreshCWGrid();
+  renderCWClues();
+}
+
+function cwKeydown(e, r, c) {
+  if (e.key === 'Backspace') {
+    e.preventDefault();
+    const cell = cwState.grid[r][c];
+    if (cell && cell.userInput) {
+      cell.userInput = '';
+      updateCWCell(r, c);
+      recheckAll();
+    } else {
+      moveCursor(-1, r, c);
+    }
+    return;
+  }
+  if (e.key === 'ArrowRight') { e.preventDefault(); cwState.activeDir = 'across'; cwMoveTo(r, c + 1); return; }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); cwState.activeDir = 'across'; cwMoveTo(r, c - 1); return; }
+  if (e.key === 'ArrowDown') { e.preventDefault(); cwState.activeDir = 'down'; cwMoveTo(r + 1, c); return; }
+  if (e.key === 'ArrowUp') { e.preventDefault(); cwState.activeDir = 'down'; cwMoveTo(r - 1, c); return; }
+  if (e.key === 'Tab') { e.preventDefault(); cycleWord(e.shiftKey ? -1 : 1); return; }
+}
+
+function cwInput(e, r, c) {
+  const val = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(-1);
+  e.target.value = val;
+  const cell = cwState.grid[r][c];
+  if (cell) {
+    cell.userInput = val;
+    if (val) moveCursor(1, r, c);
+    recheckAll();
+  }
+}
+
+function moveCursor(delta, r, c) {
+  const word = getWordContainingCell(r, c, cwState.activeDir);
+  if (!word) return;
+  let idx;
+  if (word.dir === 'across') idx = c - word.col;
+  else idx = r - word.row;
+  const newIdx = idx + delta;
+  if (newIdx >= 0 && newIdx < word.answer.length) {
+    const nr = word.dir === 'across' ? word.row : word.row + newIdx;
+    const nc = word.dir === 'across' ? word.col + newIdx : word.col;
+    cwState.activeCellR = nr;
+    cwState.activeCellC = nc;
+    const gridEl = document.getElementById('cw-grid');
+    const inp = gridEl.querySelector(`input[data-r="${nr}"][data-c="${nc}"]`);
+    if (inp) inp.focus();
+    refreshCWGrid();
+  }
+}
+
+function cwMoveTo(r, c) {
+  if (r < 0 || r >= cwState.rows || c < 0 || c >= cwState.cols) return;
+  if (!cwState.grid[r][c]) return;
+  cwState.activeCellR = r;
+  cwState.activeCellC = c;
+  const word = getWordContainingCell(r, c, cwState.activeDir);
+  cwState.activeWord = word ? cwState.words.indexOf(word) : null;
+  const gridEl = document.getElementById('cw-grid');
+  const inp = gridEl.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+  if (inp) inp.focus();
+  refreshCWGrid();
+}
+
+function cycleWord(delta) {
+  if (cwState.activeWord === null) { cwState.activeWord = 0; }
+  else {
+    cwState.activeWord = (cwState.activeWord + delta + cwState.words.length) % cwState.words.length;
+  }
+  const w = cwState.words[cwState.activeWord];
+  cwState.activeDir = w.dir;
+  cwState.activeCellR = w.row;
+  cwState.activeCellC = w.col;
+  const gridEl = document.getElementById('cw-grid');
+  const inp = gridEl.querySelector(`input[data-r="${w.row}"][data-c="${w.col}"]`);
+  if (inp) inp.focus();
+  refreshCWGrid();
+  renderCWClues();
+}
+
+function updateCWCell(r, c) {
+  const gridEl = document.getElementById('cw-grid');
+  const inp = gridEl.querySelector(`input[data-r="${r}"][data-c="${c}"]`);
+  if (inp) inp.value = cwState.grid[r][c].userInput || '';
+  const div = inp?.parentElement;
+  if (div) applyCellStyle(div, r, c);
+}
+
+function refreshCWGrid() {
+  const gridEl = document.getElementById('cw-grid');
+  gridEl.querySelectorAll('.cw-cell:not(.black)').forEach(div => {
+    const r = parseInt(div.dataset.r);
+    const c = parseInt(div.dataset.c);
+    applyCellStyle(div, r, c);
+  });
+}
+
+function recheckAll() {
+  const gridEl = document.getElementById('cw-grid');
+  gridEl.querySelectorAll('.cw-cell:not(.black)').forEach(div => {
+    const r = parseInt(div.dataset.r);
+    const c = parseInt(div.dataset.c);
+    applyCellStyle(div, r, c);
+  });
+  // Check puzzle complete
+  const allCorrect = cwState.words.every(w => isWordComplete(w));
+  if (allCorrect && cwState.words.length > 0) {
+    document.getElementById('cw-complete').style.display = 'block';
+  }
+  renderCWClues();
+}
+
+function renderCWClues() {
+  const cluesEl = document.getElementById('cw-clues');
+  const across = cwState.words.filter(w => w.dir === 'across').sort((a,b) => a.num - b.num);
+  const down = cwState.words.filter(w => w.dir === 'down').sort((a,b) => a.num - b.num);
+
+  cluesEl.innerHTML = '';
+
+  const makeSection = (title, list) => {
+    const sec = document.createElement('div');
+    sec.className = 'cw-clue-section';
+    const h3 = document.createElement('h3');
+    h3.textContent = title;
+    sec.appendChild(h3);
+    for (const w of list) {
+      const div = document.createElement('div');
+      div.className = 'cw-clue';
+      const isActive = cwState.activeWord === cwState.words.indexOf(w);
+      if (isActive) div.classList.add('active');
+      if (isWordComplete(w)) div.classList.add('solved');
+      div.innerHTML = `<span class="cw-clue-num">${w.num}</span><span>${escHtml(w.hint)}</span>`;
+      div.addEventListener('click', () => {
+        cwState.activeWord = cwState.words.indexOf(w);
+        cwState.activeDir = w.dir;
+        cwState.activeCellR = w.row;
+        cwState.activeCellC = w.col;
+        const gridEl = document.getElementById('cw-grid');
+        const inp = gridEl.querySelector(`input[data-r="${w.row}"][data-c="${w.col}"]`);
+        if (inp) inp.focus();
+        refreshCWGrid();
+        renderCWClues();
+        // Scroll grid cell into view
+        const cellDiv = gridEl.querySelector(`.cw-cell[data-r="${w.row}"][data-c="${w.col}"]`);
+        if (cellDiv) cellDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+      sec.appendChild(div);
+    }
+    return sec;
+  };
+
+  if (across.length) cluesEl.appendChild(makeSection('Across', across));
+  if (down.length) cluesEl.appendChild(makeSection('Down', down));
+}
+
+// ═══════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function sampleN(arr, n) {
+  const copy = [...arr];
+  shuffle(copy);
+  return copy.slice(0, n);
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+newConnGame();
+newCWGame();
+</script>
+</body>
+</html>
