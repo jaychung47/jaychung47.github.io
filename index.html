@@ -553,25 +553,80 @@ nav {
   margin: 20px 0;
 }
 
+/* ── HAMBURGER ── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+.hamburger span {
+  display: block;
+  height: 2px;
+  background: var(--nav-text);
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: var(--nav-bg);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  position: sticky;
+  top: 58px;
+  z-index: 99;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu-btn {
+  background: none;
+  border: none;
+  color: var(--nav-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  opacity: 0.7;
+  transition: opacity 0.15s, background 0.15s;
+  cursor: pointer;
+}
+.mobile-menu-btn:hover, .mobile-menu-btn.active { opacity: 1; background: rgba(255,255,255,0.08); }
+
 /* ── MOBILE ── */
 @media (max-width: 480px) {
-  /* Nav */
+  /* Nav — hide text links, show hamburger */
   nav {
     padding: 0 12px;
     height: 50px;
   }
   .nav-brand {
     font-size: 1rem;
-    margin-right: 10px;
+    margin-right: auto;
   }
-  .nav-btn {
-    font-size: 0.78rem;
-    padding: 6px 10px;
+  .nav-links {
+    display: none;
+  }
+  .hamburger {
+    display: flex;
   }
   .theme-toggle {
     width: 30px;
     height: 30px;
     font-size: 0.85rem;
+  }
+  .mobile-menu {
+    top: 50px;
   }
 
   /* Game page */
@@ -644,15 +699,24 @@ nav {
 <!-- NAV -->
 <nav>
   <div class="nav-brand">Jay's <span>Animal</span> Games</div>
-  <div class="nav-links">
+  <div class="nav-links" id="nav-links">
     <button class="nav-btn active" onclick="showPage('connections')">Connections</button>
     <button class="nav-btn" onclick="showPage('crossword')">Crossword</button>
     <button class="nav-btn" onclick="showPage('about')">About</button>
   </div>
   <div class="nav-right">
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+<!-- MOBILE DROPDOWN MENU -->
+<div class="mobile-menu" id="mobile-menu">
+  <button class="mobile-menu-btn active" onclick="showPage('connections');closeMenu()">Connections</button>
+  <button class="mobile-menu-btn" onclick="showPage('crossword');closeMenu()">Crossword</button>
+  <button class="mobile-menu-btn" onclick="showPage('about');closeMenu()">About</button>
+</div>
 
 <!-- CONNECTIONS PAGE -->
 <div class="page active" id="page-connections">
@@ -725,6 +789,7 @@ nav {
     <h1>About Jay's Animal Games 🐾</h1>
     <div class="placeholder-box">
       <p>These are an archive of fun animal-themed games made by animal expert Jay Chung. Website put together by her sister &lt;3</p>
+      <p style="margin-top:8px; font-size:0.85rem;">Edit the <code>index.html</code> file to fill in your About content here.</p>
     </div>
   </div>
 </div>
@@ -784,8 +849,26 @@ applyTheme();
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mobile-menu-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  event.currentTarget.classList.add('active');
+  // Highlight the matching button in both nav and mobile menu
+  const idx = ['connections','crossword','about'].indexOf(name);
+  if (idx >= 0) {
+    document.querySelectorAll('.nav-btn')[idx]?.classList.add('active');
+    document.querySelectorAll('.mobile-menu-btn')[idx]?.classList.add('active');
+  }
+}
+
+function toggleMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const burger = document.getElementById('hamburger');
+  menu.classList.toggle('open');
+  burger.classList.toggle('open');
+}
+
+function closeMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -1017,7 +1100,11 @@ function generateCrossword(pool, targetCount) {
   for (let attempt = 0; attempt < 200; attempt++) {
     const sample = sampleN(eligible, Math.min(targetCount + 10, eligible.length));
     const result = tryPlace(sample, targetCount);
-    if (result && result.words.length >= 8) return result;
+    if (result && result.words.length >= 8) {
+      const a = result.words.filter(w => w.dir === 'across').length;
+      const d = result.words.filter(w => w.dir === 'down').length;
+      if (Math.abs(a - d) <= 2) return result;
+    }
   }
   return null;
 }
@@ -1050,7 +1137,14 @@ function tryPlace(candidates, target) {
 
   for (let wi = 1; wi < words.length && placed.length < target; wi++) {
     const w = words[wi];
-    const dir = placed.length % 2 === 1 ? 'down' : 'across';
+    // Balance across/down: count what's placed so far and prefer whichever is behind
+    const acrossCount = placed.filter(p => p.dir === 'across').length;
+    const downCount = placed.filter(p => p.dir === 'down').length;
+    const halfTarget = Math.ceil(target / 2);
+    let dir;
+    if (acrossCount >= halfTarget) dir = 'down';
+    else if (downCount >= halfTarget) dir = 'across';
+    else dir = acrossCount <= downCount ? 'across' : 'down';
     const oppDir = dir === 'across' ? 'down' : 'across';
 
     // Find intersections with placed words of opposite direction
@@ -1110,7 +1204,10 @@ function tryPlace(candidates, target) {
     }
   }
 
-  if (placed.length < 6) return null;
+  const acrossTotal = placed.filter(p => p.dir === 'across').length;
+  const downTotal = placed.filter(p => p.dir === 'down').length;
+  if (placed.length < 8) return null;
+  if (Math.abs(acrossTotal - downTotal) > 2) return null;
 
   // Normalize to 0-based
   const offsetR = -minR, offsetC = -minC;
