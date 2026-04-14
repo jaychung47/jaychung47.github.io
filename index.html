@@ -789,6 +789,7 @@ nav {
     <h1>About Jay's Animal Games 🐾</h1>
     <div class="placeholder-box">
       <p>This is an archive of fun animal-themed games made by animal expert Jay Chung. Website put together by her sister &lt;3</p>
+      <p style="margin-top:8px; font-size:0.85rem;">Edit the <code>index.html</code> file to fill in your About content here.</p>
     </div>
   </div>
 </div>
@@ -1392,7 +1393,7 @@ function isWordComplete(word) {
     const r = word.dir === 'across' ? word.row : word.row + i;
     const c = word.dir === 'across' ? word.col + i : word.col;
     const cell = cwState.grid[r][c];
-    if (!cell || cell.userInput !== cell.char) return false;
+    if (!cell || !cell.userInput || cell.userInput !== cell.char) return false;
   }
   return true;
 }
@@ -1431,12 +1432,48 @@ function cwKeydown(e, r, c) {
   if (e.key === 'Backspace') {
     e.preventDefault();
     const cell = cwState.grid[r][c];
-    if (cell && cell.userInput) {
+    const isCellCorrect = (row, col) => {
+      const cell = cwState.grid[row]?.[col];
+      if (!cell || !cell.userInput) return false;
+      // Green if autocheck on and correct, or if whole word (current direction only) is correct
+      if (cwState.autocheck) return cell.userInput === cell.char;
+      const word = getWordContainingCell(row, col, cwState.activeDir);
+      return word ? isWordComplete(word) : false;
+    };
+
+    if (cell && cell.userInput && !isCellCorrect(r, c)) {
+      // Current cell has erasable input — clear it and stay
       cell.userInput = '';
       updateCWCell(r, c);
       recheckAll();
     } else {
-      moveCursor(-1, r, c);
+      // Current cell is empty or green — step back, skipping green cells
+      const word = getWordContainingCell(r, c, cwState.activeDir);
+      if (!word) return;
+      const getPos = (idx) => word.dir === 'across'
+        ? { r: word.row, c: word.col + idx }
+        : { r: word.row + idx, c: word.col };
+      const curIdx = word.dir === 'across' ? c - word.col : r - word.row;
+      let targetIdx = curIdx - 1;
+      // Skip back over green (correct) cells
+      while (targetIdx >= 0 && isCellCorrect(getPos(targetIdx).r, getPos(targetIdx).c)) {
+        targetIdx--;
+      }
+      if (targetIdx >= 0) {
+        const { r: nr, c: nc } = getPos(targetIdx);
+        cwState.activeCellR = nr;
+        cwState.activeCellC = nc;
+        const targetCell = cwState.grid[nr][nc];
+        if (targetCell && targetCell.userInput && !isCellCorrect(nr, nc)) {
+          targetCell.userInput = '';
+          updateCWCell(nr, nc);
+          recheckAll();
+        }
+        const gridEl = document.getElementById('cw-grid');
+        const inp = gridEl.querySelector(`input[data-r="${nr}"][data-c="${nc}"]`);
+        if (inp) inp.focus();
+        refreshCWGrid();
+      }
     }
     return;
   }
@@ -1449,32 +1486,48 @@ function cwKeydown(e, r, c) {
 
 function cwInput(e, r, c) {
   const val = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(-1);
-  e.target.value = val;
   const cell = cwState.grid[r][c];
-  if (cell) {
-    cell.userInput = val;
+  if (!cell) return;
+  // Don't overwrite a correctly-solved (green) cell — only check current direction's word
+  const isGreen = cell.userInput && (
+    cwState.autocheck
+      ? cell.userInput === cell.char
+      : (() => {
+          const w = getWordContainingCell(r, c, cwState.activeDir);
+          return w ? isWordComplete(w) : false;
+        })()
+  );
+  if (isGreen) {
+    e.target.value = cell.userInput;
     if (val) moveCursor(1, r, c);
-    recheckAll();
+    return;
   }
+  e.target.value = val;
+  cell.userInput = val;
+  if (val) moveCursor(1, r, c);
+  recheckAll();
 }
 
 function moveCursor(delta, r, c) {
+  // Always use the current active direction — never switch direction automatically
   const word = getWordContainingCell(r, c, cwState.activeDir);
   if (!word) return;
   let idx;
   if (word.dir === 'across') idx = c - word.col;
   else idx = r - word.row;
   const newIdx = idx + delta;
-  if (newIdx >= 0 && newIdx < word.answer.length) {
-    const nr = word.dir === 'across' ? word.row : word.row + newIdx;
-    const nc = word.dir === 'across' ? word.col + newIdx : word.col;
-    cwState.activeCellR = nr;
-    cwState.activeCellC = nc;
-    const gridEl = document.getElementById('cw-grid');
-    const inp = gridEl.querySelector(`input[data-r="${nr}"][data-c="${nc}"]`);
-    if (inp) inp.focus();
-    refreshCWGrid();
-  }
+  // Clamp to word bounds — never overshoot into a perpendicular word
+  const clampedIdx = Math.max(0, Math.min(word.answer.length - 1, newIdx));
+  // Only move if we're actually going somewhere new
+  if (clampedIdx === idx && delta > 0) return; // already at end, stay put
+  const nr = word.dir === 'across' ? word.row : word.row + clampedIdx;
+  const nc = word.dir === 'across' ? word.col + clampedIdx : word.col;
+  cwState.activeCellR = nr;
+  cwState.activeCellC = nc;
+  const gridEl = document.getElementById('cw-grid');
+  const inp = gridEl.querySelector(`input[data-r="${nr}"][data-c="${nc}"]`);
+  if (inp) inp.focus();
+  refreshCWGrid();
 }
 
 function cwMoveTo(r, c) {
@@ -1530,10 +1583,15 @@ function recheckAll() {
     const c = parseInt(div.dataset.c);
     applyCellStyle(div, r, c);
   });
-  // Check puzzle complete
-  const allCorrect = cwState.words.every(w => isWordComplete(w));
-  if (allCorrect && cwState.words.length > 0) {
-    document.getElementById('cw-complete').style.display = 'block';
+  // Check puzzle complete — guard against empty array (every() is vacuously true)
+  // and require every single grid cell to have an input before declaring victory
+  if (cwState.words.length > 0) {
+    const allWordsCorrect = cwState.words.every(w => isWordComplete(w));
+    const totalCells = cwState.grid.flat().filter(cell => cell !== null).length;
+    const filledCells = cwState.grid.flat().filter(cell => cell !== null && cell.userInput !== '').length;
+    if (allWordsCorrect && filledCells === totalCells) {
+      document.getElementById('cw-complete').style.display = 'block';
+    }
   }
   renderCWClues();
 }
