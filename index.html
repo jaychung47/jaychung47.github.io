@@ -552,6 +552,91 @@ nav {
   background: var(--border);
   margin: 20px 0;
 }
+
+/* ── MOBILE ── */
+@media (max-width: 480px) {
+  /* Nav */
+  nav {
+    padding: 0 12px;
+    height: 50px;
+  }
+  .nav-brand {
+    font-size: 1rem;
+    margin-right: 10px;
+  }
+  .nav-btn {
+    font-size: 0.78rem;
+    padding: 6px 10px;
+  }
+  .theme-toggle {
+    width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+  }
+
+  /* Game page */
+  .page { min-height: calc(100vh - 50px); }
+  .game-page {
+    padding: 16px 12px 40px;
+  }
+  .game-header {
+    margin-bottom: 14px;
+  }
+  .game-title {
+    font-size: 1.4rem;
+  }
+  #conn-puzzle-id {
+    font-size: 0.7rem;
+  }
+
+  /* Connections tiles — squatter so text fits in narrow columns */
+  .conn-tile {
+    aspect-ratio: 1 / 0.85;
+    font-size: 0.7rem;
+    padding: 6px 4px;
+    border-radius: 6px;
+  }
+  .conn-grid {
+    gap: 6px;
+  }
+
+  /* Attempts row */
+  .conn-attempts {
+    margin-bottom: 12px;
+  }
+
+  /* Action buttons — equal width, fill row */
+  .conn-actions {
+    gap: 6px;
+  }
+  .conn-btn {
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* Solved banners */
+  .conn-solved-row .row-items {
+    font-size: 0.72rem;
+  }
+
+  /* Crossword — stack grid above clues */
+  .crossword-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .cw-grid-wrap {
+    max-width: 100%;
+  }
+  .cw-clues {
+    max-height: 280px;
+  }
+  .cw-clue {
+    font-size: 0.78rem;
+  }
+}
 </style>
 </head>
 <body>
@@ -1122,7 +1207,10 @@ function countRun(grid, r, c, dir) {
 function renderCW() {
   const { grid, rows, cols, words } = cwState;
   const gridEl = document.getElementById('cw-grid');
-  const MAX_GRID_PX = 336; // max-width 340px minus a little breathing room
+  const isMobile = window.innerWidth <= 480;
+  const MAX_GRID_PX = isMobile
+    ? Math.min(window.innerWidth - 28, 340)  // full width minus padding on mobile
+    : 336;
   const cellSize = Math.min(36, Math.floor((MAX_GRID_PX - (cols - 1) * 2) / cols));
   gridEl.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
   gridEl.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
